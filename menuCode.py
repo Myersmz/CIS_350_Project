@@ -1,4 +1,5 @@
 from characterClass import Character
+import pickle
 
 def startMenu():
     # Simple variable to check if the game is supposed to be running, if so it will change the prompt
@@ -47,3 +48,40 @@ def startMenu():
 
 # Call the function to start the menu
 startMenu()
+
+def save():
+    # Creates a dictionary to pickle all needed game objects. Any other needed objects are easily addable.  
+    saveObject = {
+        "Rooms": self.currentRoom,
+        "Player": self.playeris
+    }
+    
+    # Dumps the saveObject to the working directory of the script.
+    pickle.dump(saveObject, open("savefile", "wb"))
+
+
+def load():
+    
+    # Loads the saveObject dictionary from a savefile-file in the working directory.
+    Object = pickle.load(open("savefile", "rb"))
+    
+    # Restores the objects from the dictionary.
+    self.currentRoom = Object.get("Rooms", None)
+    self.player = Object.get("Player", None)
+
+    # Checks to see if any game objects are missing after loading from the save.
+    if None in (self.currentRoom, self.player):
+        print("Encountered an error while loading the savefile.")
+        
+        # Intake the player's choice to quit or start a new game.
+        playerChoice = None
+        while playerChoice not in ['y', 'n']:
+            playerChoice = input("Do you want to start a new game? (y/n)\n").lower()
+            
+        if playerChoice == 'y':
+            # Player decided to create a new game.
+            self.generateRooms()
+        else:
+            # Player choose to quit.
+            print("Exiting..")
+            exit()
