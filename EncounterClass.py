@@ -1,7 +1,7 @@
 import random
 class Encounter:
 
-    def __int__(self):
+    def __init__(self):
 
         #movement options
         self.Options = ['yes', 'no', 'forward', 'back', 'left', 'right']
@@ -36,6 +36,20 @@ class Encounter:
         boss = random.choice(self.Monsters)
         print(f'You encounter a {boss}')
 
+        #TODO: implement combat mechanics with player stats and equipment
+
+        while True:
+            user_input = input('Attack or Defend? (a/d)\n')
+            if user_input.lower().strip() == 'a':
+                #placeholder for combat mechanics with possible failure?
+                print('ATTACK')
+            elif user_input.lower().strip() == 'd':
+                #placeholder for combat mechanics and possible chance at failure?
+                print('DEFEND')
+                break
+            else:
+                print('Invalid input.')
+
     #chooses random question, checks for answers in the answers list. unlimited tries, or can give up.
     def puzzle_room(self):
         puzzle_question = random.choice(self.questions)
@@ -46,11 +60,13 @@ class Encounter:
             user_input = input('answer: ')
             if user_input.lower().strip() in puzzle_answers:
                 print('Well done!')
-                #move on from here
+                #TODO: possibly add reward item
+                break
             elif user_input.lower().strip() not in puzzle_answers:
                 user_input = input('Hm, not quite. Would you like to try again? yes/no')
                 if user_input.lower().strip() == 'no':
                     break
 
+    #TODO: possibly add random loot chance or trap?
     def empty_room(self):
         print('You encounter an empty room')
