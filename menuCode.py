@@ -49,11 +49,12 @@ def startMenu():
 # Call the function to start the menu
 startMenu()
 
+
 def save():
     # Creates a dictionary to pickle all needed game objects. Any other needed objects are easily addable.  
     saveObject = {
         "Rooms": self.currentRoom,
-        "Player": self.playeris
+        "Player": self.player
     }
     
     # Dumps the saveObject to the working directory of the script.
