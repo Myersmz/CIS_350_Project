@@ -1,6 +1,7 @@
 from EncounterClass import Encounter
 from Item import Item
 
+
 class Room:
 
     def __init__(self, name, left=None, up=None, right=None, down=None, items=None):
