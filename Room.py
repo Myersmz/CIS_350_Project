@@ -12,6 +12,10 @@ class Room:
         self.items = items
         self.encounter = Encounter()
 
+    def assignRoom(self, room, direction):
+        self.adjacentRooms[direction] = room
+        room.adjacentRooms[(direction + 2) % 4] = self
+
     def enter_room(self):
         print(f'You have entered {self.name}')
         return self.encounter

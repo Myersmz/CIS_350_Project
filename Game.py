@@ -1,4 +1,7 @@
+import random
+
 from characterClass import Character
+from Room import Room
 import pickle
 
 
@@ -10,6 +13,8 @@ class Game:
         self.game_started = False
 
     def start(self):
+        self.generateRooms()
+        print(self.currentRoom)
         self.startMenu()
 
     def gameLoop(self):
@@ -93,3 +98,31 @@ class Game:
                 # Player choose to quit.
                 print("Exiting..")
                 exit()
+
+    def generateRooms(self):
+        self.currentRoom = Room("Entrance")
+
+        dungeonSize = 10
+
+        # gridSize = (dungeonSize + 1) % 2 + dungeonSize * 2
+        # grid = [[]*gridSize]*gridSize
+        #
+        # grid[dungeonSize][dungeonSize] = self.currentRoom
+        rooms = [self.currentRoom]
+
+        # Create rooms
+        createdRooms = 1
+
+        while createdRooms < dungeonSize:
+            selectedRoom = rooms[random.randint(0, len(rooms) - 1)]
+            direction = random.randint(0, 3)
+
+            if selectedRoom.adjacentRooms[direction] is None:
+                newRoom = Room("Room " + str(createdRooms))
+                rooms.append(newRoom)
+                selectedRoom.assignRoom(newRoom, direction)
+                createdRooms += 1
+
+
+game = Game()
+game.start()
