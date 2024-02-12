@@ -4,8 +4,11 @@ from characterClass import Character
 
 class Encounter:
     def __init__(self):
-        # movement options
+
         self.player = None
+        self.is_empty = True
+
+        # movement options
         self.Options = ['yes', 'no', 'forward', 'back', 'left', 'right']
 
         # possible monsters
@@ -25,6 +28,7 @@ class Encounter:
 
     # chooses random monster from Monsters list
     def boss_fight(self):
+        self.is_empty = False
 
         # choose random boss from the list
         boss_name = random.choice(self.Monsters)
@@ -64,6 +68,7 @@ class Encounter:
                 attack(self.player, boss)
                 if boss.health <= 0:
                     # boss defeated, break out of the loop
+                    self.is_empty = True
                     break
                 defend(self.player, boss)
             elif user_input.lower().strip() == 'd':
