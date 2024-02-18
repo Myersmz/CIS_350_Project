@@ -102,13 +102,11 @@ class Game:
     def generateRooms(self):
         self.currentRoom = Room("Entrance")
 
-        dungeonSize = 10
+        dungeonSize = 40
 
-        # gridSize = (dungeonSize + 1) % 2 + dungeonSize * 2
-        # grid = [[]*gridSize]*gridSize
-        #
-        # grid[dungeonSize][dungeonSize] = self.currentRoom
+        # gridSize = (dungeonSize + 1) % 2 + (dungeonSize * 2)
         rooms = [self.currentRoom]
+        roomMap = {0: {0: self.currentRoom}}
 
         # Create rooms
         createdRooms = 1
@@ -119,9 +117,60 @@ class Game:
 
             if selectedRoom.adjacentRooms[direction] is None:
                 newRoom = Room("Room " + str(createdRooms))
-                rooms.append(newRoom)
                 selectedRoom.assignRoom(newRoom, direction)
+                rooms.append(newRoom)
+
+                if roomMap.get(newRoom.position[0], None) is None:
+                    roomMap[newRoom.position[0]] = {newRoom.position[1]: newRoom}
+                else:
+                    roomMap[newRoom.position[0]][newRoom.position[1]] = newRoom
+
+                newRoom_position = newRoom.position
+
+                rm = roomMap.get(newRoom_position[0] - 1, {}).get(newRoom_position[1], None)
+                if rm is not None and rm != selectedRoom:
+                    rm.assignRoom(newRoom, 2)
+                rm = roomMap.get(newRoom_position[0], {}).get(newRoom_position[1] - 1, None)
+                if rm is not None and rm != selectedRoom:
+                    rm.assignRoom(newRoom, 3)
+                rm = roomMap.get(newRoom_position[0] + 1, {}).get(newRoom_position[1], None)
+                if rm is not None and rm != selectedRoom:
+                    rm.assignRoom(newRoom, 0)
+                rm = roomMap.get(newRoom_position[0], {}).get(newRoom_position[1] + 1, None)
+                if rm is not None and rm != selectedRoom:
+                    rm.assignRoom(newRoom, 1)
+
                 createdRooms += 1
+
+        # print(len(rooms))
+        # dups = 0
+        # for i in range(len(rooms)):
+        #     print("")
+        #     for rm in rooms[i+1:]:
+        #         print(rooms[i].position + rm.position)
+        #         if rooms[i].position == rm.position:
+        #             dups += 1
+        #             print("Duplicate found")
+        #
+        # print("Duplicates: " + str(dups))
+
+        #     catStr = ""
+        #     for c in range(gridSize):
+        #         if isinstance(grid[r][c], Room):
+        #             if grid[r][c].name == "Entrance":
+        #                 catStr += "E"
+        #             else:
+        #                 catStr += "■"
+        #         else:
+        #             catStr += "░"
+        #     print(catStr)
+
+    # TODO
+    # Create this function to create a visible map of the rooms for debug and potentially in-game.
+    # def generateMap(self):
+    #     visitedRooms = []
+
+    # def traverseMap(self, room, ):
 
 
 game = Game()
