@@ -16,7 +16,7 @@ class Room:
         self.adjacentRooms[direction] = room
         room.adjacentRooms[(direction + 2) % 4] = self
 
-    # 1 is West, 2 is North, 3 is East, 4 is South
+    # 0 is West, 1 is North, 2 is East, 3 is South
     def is_dead_end(self, direction:int):
         if self.adjacentRooms[direction]:
             return False
@@ -34,6 +34,18 @@ class Room:
              self.items.append(item)
          else:
              raise(TypeError, "Not a valid item")
+         
+    def directions(self):
+        direction_string = ''
+        if self.adjacentRooms[0]:
+            direction_string += 'West, '
+        if self.adjacentRooms[1]:
+            direction_string += 'North, '
+        if self.adjacentRooms[2]:
+            direction_string += 'East, '
+        if self.adjacentRooms[3]:
+            direction_string += 'South'    
+        return direction_string
 
 
 
