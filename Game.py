@@ -1,4 +1,4 @@
-from characterClass import Character 
+from characterClass import Character
 from characterClass import CharacterDeathException
 from EncounterClass import Encounter
 from Item import Item
@@ -30,22 +30,22 @@ class Game:
                 choice = input("What would you like to do?: (enter ? for options)").lower()
 
                 if choice == 'west':
-                    if(self.currentRoom.is_dead_end(0)):
+                    if self.currentRoom.is_dead_end(0):
                         print('There is no room west of this room.\n')
                     else:
                         self.currentRoom = self.currentRoom.adjacentRooms[0]
                 elif choice == 'north':
-                    if(self.currentRoom.is_dead_end(1)):
+                    if self.currentRoom.is_dead_end(1):
                         print('There is no room north of this room.\n')
                     else:
                         self.currentRoom = self.currentRoom.adjacentRooms[1]
                 elif choice == 'east':
-                    if(self.currentRoom.is_dead_end(2)):
+                    if self.currentRoom.is_dead_end(2):
                         print('There is no room east of this room.\n')
                     else:
                         self.currentRoom = self.currentRoom.adjacentRooms[2]
                 elif choice == 'south':
-                    if(self.currentRoom.is_dead_end(3)):
+                    if self.currentRoom.is_dead_end(3):
                         print('There is no room south of this room.\n')
                     else:
                         self.currentRoom = self.currentRoom.adjacentRooms[3]
@@ -57,7 +57,7 @@ class Game:
                     if self.currentRoom.encounter.encounter_type == 1 and not self.currentRoom.encounter.is_empty:
                         try:
                             self.currentRoom.encounter.boss.take_damage(self.player)
-                        except(CharacterDeathException):
+                        except CharacterDeathException:
                             print(f'The {self.currentRoom.encounter.boss.name} has been slain !!!')
                             self.currentRoom.encounter.is_empty = True
                     else:
@@ -95,7 +95,7 @@ class Game:
             print(f'You encounter a {self.currentRoom.encounter.boss.name}')
             try:
                 self.player.take_damage(self.currentRoom.encounter.boss)
-            except(CharacterDeathException):
+            except CharacterDeathException:
                 print('\nYou have died!!!')
                 self.game_started = False
                 self.startMenu()
@@ -106,16 +106,16 @@ class Game:
         print(f'There are rooms to the {self.currentRoom.directions()} of this room\n')
 
     def printChoices(self):
-        print('\nwest - to go to the room to the west')       
-        print('north - to go to the room to the north')      
-        print('east - to go to the room to the east')      
-        print('south - to go to the room to the south')      
-        print('? - to get command options')   
+        print('\nwest - to go to the room to the west')
+        print('north - to go to the room to the north')
+        print('east - to go to the room to the east')
+        print('south - to go to the room to the south')
+        print('? - to get command options')
         print('pickup - to pickup an item in a room')
-        print('attack - attack any monster in the room')      
-        print('stats - print out character stats')   
-        print('save - save the game')        
-        print('quit - quit the game') 
+        print('attack - attack any monster in the room')
+        print('stats - print out character stats')
+        print('save - save the game')
+        print('quit - quit the game')
         print('guess - guess in a puzzle room\n')
 
     def startMenu(self):
@@ -159,20 +159,20 @@ class Game:
             self.currentRoom = Object.get("Rooms", None)
             self.player = Object.get("Player", None)
             self.game_started = True
-        except (FileNotFoundError):
+        except FileNotFoundError:
             print("Encountered an error while loading the savefile.\n")
 
+    def createPlayer(self):
+        self.player = Character('Mike1', 1000, 1000, 20)
 
     def generateRooms(self):
         self.currentRoom = Room("Entrance")
 
-        dungeonSize = 10
+        dungeonSize = 40
 
-        # gridSize = (dungeonSize + 1) % 2 + dungeonSize * 2
-        # grid = [[]*gridSize]*gridSize
-        #
-        # grid[dungeonSize][dungeonSize] = self.currentRoom
+        # gridSize = (dungeonSize + 1) % 2 + (dungeonSize * 2)
         rooms = [self.currentRoom]
+        roomMap = {0: {0: self.currentRoom}}
 
         # Create rooms
         createdRooms = 1
@@ -183,17 +183,37 @@ class Game:
 
             if selectedRoom.adjacentRooms[direction] is None:
                 newRoom = Room("Room " + str(createdRooms))
-                rooms.append(newRoom)
                 selectedRoom.assignRoom(newRoom, direction)
+                rooms.append(newRoom)
+
+                if roomMap.get(newRoom.position[0], None) is None:
+                    roomMap[newRoom.position[0]] = {newRoom.position[1]: newRoom}
+                else:
+                    roomMap[newRoom.position[0]][newRoom.position[1]] = newRoom
+
+                newRoom_position = newRoom.position
+
+                rm = roomMap.get(newRoom_position[0] - 1, {}).get(newRoom_position[1], None)
+                if rm is not None and rm != selectedRoom:
+                    rm.assignRoom(newRoom, 2)
+                rm = roomMap.get(newRoom_position[0], {}).get(newRoom_position[1] - 1, None)
+                if rm is not None and rm != selectedRoom:
+                    rm.assignRoom(newRoom, 3)
+                rm = roomMap.get(newRoom_position[0] + 1, {}).get(newRoom_position[1], None)
+                if rm is not None and rm != selectedRoom:
+                    rm.assignRoom(newRoom, 0)
+                rm = roomMap.get(newRoom_position[0], {}).get(newRoom_position[1] + 1, None)
+                if rm is not None and rm != selectedRoom:
+                    rm.assignRoom(newRoom, 1)
+
                 createdRooms += 1
 
-    def createPlayer(self):
-        self.player = Character('Mike1', 1000, 1000, 20)
 
 def main():
     # do the game
     g = Game()
     g.play()
+
 
 if __name__ == '__main__':
     main()
