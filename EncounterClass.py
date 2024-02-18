@@ -24,30 +24,26 @@ class Encounter:
         self.questions = list(self.Riddles.keys())
         self.answers = list(self.Riddles.values())
 
-        self.encounter_type = encounter_type
-
-        if encounter_type == None:
-            self.generate_encounter()
-        else:
-            self.generate_encounter(encounter_type)
+        self.generate_encounter(encounter_type)
 
     # chooses random monster from Monsters list
-    def boss_fight(self, player):
+    def boss_fight(self):
         self.is_empty = False
 
         # choose random boss from the list
         boss_name = random.choice(self.Monsters)
 
         # scale boss stats according to current player stats
-        monster_health = int(player.health * 1.5)
-        monster_attack = int(player.base_attack * 0.25)
-        monster_defense = int(player.base_defense * 0.25)
+        monster_health = 150
+        monster_attack = 25
+        monster_defense = 25
 
         # create boss object
         self.boss = Character(boss_name, monster_health, monster_attack, monster_defense)
 
     # chooses random question
     def puzzle_room(self):
+        self.is_empty = False
         self.puzzle_question = random.choice(self.questions)
 
     # TODO: possibly add random loot chance or trap?
@@ -55,10 +51,15 @@ class Encounter:
         pass
 
     # encounterType rolls 1-3 inculsive
-    def generate_encounter(self, encounter_type = random.randint(1, 3)):
-        if encounter_type == 1:
-            self.bossFight()
-        if self.encounter_type == 2:
-            self.puzzleRoom()
+    def generate_encounter(self, encounter_type = None):
+        if encounter_type == None:
+            self.encounter_type = random.randint(1,3)
         else:
-            self.emptyRoom()
+            self.encounter_type = encounter_type
+            
+        if self.encounter_type == 1:
+            self.boss_fight()
+        if self.encounter_type == 2:
+            self.puzzle_room()
+        else:
+            self.empty_room()

@@ -3,7 +3,9 @@ class Character:
         self.name = name
         self.health = health
         self.base_attack = attack
+        self.attack = attack
         self.base_defense = defense
+        self.defense = defense
         self.inventory = []
 
 #Currently the inventory is just a list of strings, we can change that if needed, and for now the only "functional" items are the shield and sword increasing defense and attack respectively
@@ -44,11 +46,11 @@ class Character:
         print("Character Inventory:", self.inventory)
 
     def take_damage(self, attacker):
-        damage = max(0, attacker.base_attack - self.base_defense)
+        damage = max(0, attacker.attack - self.defense)
         self.health -= damage
         print(f'{attacker.name} deals {damage} damage to {self.name}')
         if self.health <= 0:
-            raise(CharacterDeathException, f'{self.name} has died', self)
+            raise(CharacterDeathException(f'{self.name} has died', self))
         else:
             print(f'{self.name} has {self.health} health left.')
 
@@ -79,7 +81,7 @@ class Character:
     #while True:
         #handle_input()
 
-class CharacterDeathException(Exception):
+class CharacterDeathException(BaseException):
     """
     Description: Exception for when a character dies handled in game.py raised in character.py
     """
