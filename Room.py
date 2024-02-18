@@ -16,16 +16,12 @@ class Room:
         self.adjacentRooms[direction] = room
         room.adjacentRooms[(direction + 2) % 4] = self
 
-    def enter_room(self):
-        print(f'You have entered {self.name}')
-        return self.encounter
-
-    # 1 is left, 2 is up, 3 is right, 4 is down
+    # 1 is West, 2 is North, 3 is East, 4 is South
     def is_dead_end(self, direction:int):
         if self.adjacentRooms[direction]:
-            return True
-        else:
             return False
+        else:
+            return True
 
     def grab_item(self, item_name : str):
         for i in self.items:

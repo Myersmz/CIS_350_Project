@@ -12,53 +12,85 @@ class Game:
 
     def start(self):
         self.generateRooms()
-        print(self.currentRoom)
-        self.startMenu()
+        self.createPlayer()
+        self.game_started = True
 
-    def gameLoop(self):
-        pass
-
-    def startMenu(self):
-
-        # Loops constantly to display the menu options, if the game is supposed to be running, it will move to the second prompt
+    def play(self):
         while True:
             if not self.game_started:
-                print("Welcome to the game!")
-                print("Press p to play")
-                print("Press l to load")
-                print("Press Q to quit")
-            else:
-                print("Press 'i' to view character info, 'q' to quit")
+                self.startMenu()
+                self.currentRoom.enter_room()
+            elif self.currentRoom.encounter.is_empty():
+                print('You encounter an empty room')
+                pass
 
-            choice = input("Enter your choice: ").lower()
+            choice = input("What would you like to do?: (enter ? for options)").lower()
 
-            if choice == 'p':
-                if not self.game_started:
-                    print("Starting new game...")
-                    # Creates an example character
-                    self.player = Character(name="TestCharacter", health=100, attack=5, defense=10)
-                    self.player.add_to_inventory("Potion")
-                    self.player.add_to_inventory("Sword")
-                    self.player.add_to_inventory("Shield")
-                    self.player.add_to_inventory("Arrows")
-                    self.player.remove_from_inventory("Arrows")
-                    game_started = True
-            elif choice == 'l':
-                print("Loading game...")
-                # Add code to load the game here
-            elif choice == 'q':
-                print("Quitting...")
-                break
-            elif self.game_started and choice in ['i', 'q']:
+            if choice == 'west':
+                if(self.currentRoom.is_dead_end(1)):
+                    print('There is no room west of this room.')
+                else:
+                    self.currentRoom = self.currentRoom.adjacentRooms[1]
+            elif choice == 'north':
+                if(self.currentRoom.is_dead_end(2)):
+                    print('There is no room north of this room.')
+                else:
+                    self.currentRoom = self.currentRoom.adjacentRooms[2]
+            elif choice == 'east':
+                if(self.currentRoom.is_dead_end(3)):
+                    print('There is no room east of this room.')
+                else:
+                    self.currentRoom = self.currentRoom.adjacentRooms[3]
+            elif choice == 'south':
+                if(self.currentRoom.is_dead_end(4)):
+                    print('There is no room south of this room.')
+                else:
+                    self.currentRoom = self.currentRoom.adjacentRooms[4]
+            elif choice == '?':
+                self.printChoices()
+            elif choice == 'pickup':
+                pass
+            elif choice == 'attack':
+                pass
+            elif choice == 'stats':
+                pass
+            elif choice == 'save':
+                pass
+            elif choice == 'quit':
+                pass
+            elif choice == 'guess':
+                pass
+            elif choice == 'guess':
+                pass
 
-                # If the game has started and the choice is either 'i' or 'q', handle input using character input handling
-                if choice == 'i':
-                    self.player.print_character_info()
-                elif choice == 'q':
-                    print("Exiting program.")
-                    break  # Exit the program
-            else:
-                print("Invalid choice. Please try again.")
+
+    def printChoices():
+        print('west - to go to the room to the west')       
+        print('north - to go to the room to the north')      
+        print('east - to go to the room to the east')      
+        print('south - to go to the room to the south')      
+        print('? - to get command options')   
+        print('pickup - to pickup an item in a room')
+
+    def startMenu(self):
+        print("Welcome to the Run Escape!")
+        print("Press P to play")
+        print("Press L to load")
+        print("Press Q to quit")
+
+        choice = input("Enter your choice: ").lower()
+
+        if choice == 'p':
+            print("Starting new game...")
+            self.start()
+        elif choice == 'l':
+            print("Loading game...")
+            self.load()
+        elif choice == 'q':
+            print("Quitting...")
+            exit()
+        else:
+            print("Invalid choice. Please try again.")
 
     def save(self):
         # Creates a dictionary to pickle all needed game objects. Any other needed objects are easily addable.
@@ -89,9 +121,7 @@ class Game:
                 playerChoice = input("Do you want to start a new game? (y/n)\n").lower()
 
             if playerChoice == 'y':
-                # Player decided to create a new game.
-                # self.generateRooms()
-                pass
+                self.start()
             else:
                 # Player choose to quit.
                 print("Exiting..")
@@ -120,3 +150,14 @@ class Game:
                 rooms.append(newRoom)
                 selectedRoom.assignRoom(newRoom, direction)
                 createdRooms += 1
+
+    def createPlayer(self):
+        pass
+
+def main():
+    # do the game
+    g = Game()
+    g.play()
+
+if __name__ == '__main__':
+    main()
