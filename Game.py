@@ -13,6 +13,7 @@ class Game:
         self.player = None
         self.currentRoom = None
         self.game_started = False
+        self.dungeonSize = 14
 
     def start(self):
         self.generateRooms()
@@ -168,8 +169,6 @@ class Game:
     def generateRooms(self):
         self.currentRoom = Room("Entrance")
 
-        dungeonSize = 40
-
         # gridSize = (dungeonSize + 1) % 2 + (dungeonSize * 2)
         rooms = [self.currentRoom]
         roomMap = {0: {0: self.currentRoom}}
@@ -177,7 +176,7 @@ class Game:
         # Create rooms
         createdRooms = 1
 
-        while createdRooms < dungeonSize:
+        while createdRooms < self.dungeonSize:
             selectedRoom = rooms[random.randint(0, len(rooms) - 1)]
             direction = random.randint(0, 3)
 
