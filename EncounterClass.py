@@ -3,9 +3,7 @@ from characterClass import Character
 
 
 class Encounter:
-    def __init__(self):
-
-        self.player = None
+    def __init__(self, encounter_type: int = None):
         self.is_empty = True
 
         # movement options
@@ -26,88 +24,41 @@ class Encounter:
         self.questions = list(self.Riddles.keys())
         self.answers = list(self.Riddles.values())
 
+        self.encounter_type = encounter_type
+
+        if encounter_type == None:
+            self.generate_encounter()
+        else:
+            self.generate_encounter(encounter_type)
+
     # chooses random monster from Monsters list
-    def boss_fight(self):
+    def boss_fight(self, player):
         self.is_empty = False
 
         # choose random boss from the list
         boss_name = random.choice(self.Monsters)
-        print(f'You encounter a {boss_name}')
 
         # scale boss stats according to current player stats
-        monster_health = int(self.player.health * 1.5)
-        monster_attack = int(self.player.base_attack * 0.25)
-        monster_defense = int(self.player.base_defense * 0.25)
+        monster_health = int(player.health * 1.5)
+        monster_attack = int(player.base_attack * 0.25)
+        monster_defense = int(player.base_defense * 0.25)
 
         # create boss object
-        boss = Character(boss_name, monster_health, monster_attack, monster_defense)
+        self.boss = Character(boss_name, monster_health, monster_attack, monster_defense)
 
-        # combat methods
-        def attack(self, boss):
-            damage = max(0, self.player.base_attack - boss.base_defense)
-            boss.health -= damage
-            print(f'You deal {damage} damage to the {boss_name}')
-            if boss.health <= 0:
-                print(f'The {boss_name} has been defeated!')
-            else:
-                print(f'The {boss_name} has {boss.health} health remaining.')
-
-        def defend(self, player):
-            damage = max(0, boss.base_defense - player.base_attack)
-            player.health -= damage
-            print(f'The {boss_name} dealt {damage} damage to you!')
-            if self.player.health <= 0:
-                print(f'You have been defeated!')
-            else:
-                print(f'You have {self.player.health} health left.')
-
-        # combat loop
-        while True:
-            user_input = input('Attack or Defend? (a/d)\n')
-            if user_input.lower().strip() == 'a':
-                attack(self.player, boss)
-                if boss.health <= 0:
-                    # boss defeated, break out of the loop
-                    self.is_empty = True
-                    break
-                defend(self.player, boss)
-            elif user_input.lower().strip() == 'd':
-                defend(self.player, boss)
-                if self.player.health <= 0:
-                    # player defeated, break out of the loop
-                    break
-                attack(self.player, boss)
-            else:
-                print('Invalid input.')
-
-
-    # chooses random question, checks for answers in the answers list. unlimited tries, or can give up.
+    # chooses random question
     def puzzle_room(self):
-        puzzle_question = random.choice(self.questions)
-        puzzle_answers = self.answers
-        user_input = ''
-        print(f'You encounter a puzzle room: {puzzle_question}')
-        while user_input not in puzzle_answers:
-            user_input = input('answer: ')
-            if user_input.lower().strip() in puzzle_answers:
-                print('Well done!')
-                # TODO: possibly add reward item
-                break
-            elif user_input.lower().strip() not in puzzle_answers:
-                user_input = input('Hm, not quite. Would you like to try again? yes/no')
-                if user_input.lower().strip() == 'no':
-                    break
+        self.puzzle_question = random.choice(self.questions)
 
     # TODO: possibly add random loot chance or trap?
     def empty_room(self):
-        print('You encounter an empty room')
+        pass
 
-        # encounterType rolls 1-3 inculsive
-        def generate_encounter(self):
-            encounter_type = random.randint(1, 3)
-            if encounter_type == 1:
-                return self.bossFight()
-            if encounter_type == 2:
-                return self.puzzleRoom()
-            else:
-                return self.emptyRoom()
+    # encounterType rolls 1-3 inculsive
+    def generate_encounter(self, encounter_type = random.randint(1, 3)):
+        if encounter_type == 1:
+            self.bossFight()
+        if self.encounter_type == 2:
+            self.puzzleRoom()
+        else:
+            self.emptyRoom()
