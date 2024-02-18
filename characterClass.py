@@ -43,6 +43,15 @@ class Character:
         print("Character Defense:", self.defense)
         print("Character Inventory:", self.inventory)
 
+    def take_damage(self, attacker):
+        damage = max(0, attacker.base_attack - self.base_defense)
+        self.health -= damage
+        print(f'{attacker.name} deals {damage} damage to {self.name}')
+        if self.health <= 0:
+            raise(CharacterDeathException, f'{self.name} has died', self)
+        else:
+            print(f'{self.name} has {self.health} health left.')
+
 # Allows for input to be taken from the user, for this instance I only added i to view character info and q to quit the program. It is also commented out because it was rendered obsolete from the startMenu code
 #def handle_input():
     #user_input = input("Press 'i' to view character info, 'q' to quit: ")
@@ -69,3 +78,11 @@ class Character:
     #Continuously checks for user input
     #while True:
         #handle_input()
+
+class CharacterDeathException(Exception):
+    """
+    Description: Exception for when a character dies handled in game.py raised in character.py
+    """
+    def __init__(self, st, character) -> None:
+        super().__init__(st)
+        self.character = character
