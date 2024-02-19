@@ -1,6 +1,12 @@
 import random
 from characterClass import Character
 
+'''
+
+Represents an encounter in the game, which can be a boss fight, puzzle room, or an empty room. Has methods like 
+`boss_fight`, `puzzle_room`, `empty_room`, and `generate_encounter` to create different types of encounters.
+
+'''
 
 class Encounter:
     def __init__(self, encounter_type: int = None):
