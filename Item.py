@@ -1,9 +1,11 @@
+import json
+import random
 from enum import Enum
 
 
 class ItemTypes(Enum):
-    SWORD = 0
-    BOW = 1
+    MELEE = 0
+    RANGED = 1
     SHIELD = 2
     POTION = 3
     ITEM = 4
@@ -23,8 +25,49 @@ class Item:
         # If potions are implemented this could also be used as the health that it would heal.
         self.attributeValue = attribute_value
 
-    # TODO
     def generateItem(self, item_type=ItemTypes.ITEM):
         # Will set values of this object randomly using pre-defined lists of names,
         # descriptions, and attribute values for a given itemType
-        pass
+
+        # item json format
+        # {"NAME": "", "DESCRIPTION": "", "ATTRIBUTE": int, "RARITY": int}
+        typeString = str(item_type)[10:]
+        this_item = None
+
+        file = None
+        try:
+            file = open("items.json", "r")
+        except:
+            print("Failed to load items.")
+            raise FileNotFoundError
+
+        items = json.load(file)
+        item_list = items.get(typeString, None)
+
+        weight_sum = 0
+        for item in item_list:
+            weight_sum += item.get("RARITY", 0)
+
+        choice = random.randint(1, weight_sum)
+
+        for item in item_list:
+            choice -= item.get("RARITY", 0)
+
+            if choice <= 0:
+                this_item = item
+                file.close()
+                break
+
+        self.name = this_item.get("NAME")
+        self.description = this_item.get("DESCRIPTION")
+        self.attributeValue = this_item.get("ATTRIBUTE")
+        self.type = item_type
+
+    def display(self):
+        printStr = f"--~= {self.name} =~--\n{self.description}\n"
+        if self.type in [ItemTypes.MELEE, ItemTypes.RANGED]:
+            printStr += f"\nAttack: {self.attributeValue}"
+        elif self.type in [ItemTypes.SHIELD, ItemTypes.ARMOUR]:
+            printStr += f"\nDefense: {self.attributeValue}"
+
+        return printStr

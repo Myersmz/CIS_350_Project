@@ -1,0 +1,38 @@
+{
+  "MELEE": [
+    {"NAME": "Wooden Short Sword", "DESCRIPTION": "A battered and blunt sword, not a very good weapon.", "ATTRIBUTE": 2, "RARITY":  10},
+    {"NAME": "Wooden Sword", "DESCRIPTION": "It's slightly worn.", "ATTRIBUTE": 3, "RARITY": 10},
+    {"NAME": "Rusty Sword", "DESCRIPTION": "This must've been here a long time...", "ATTRIBUTE": 4, "RARITY": 7},
+    {"NAME": "Axe", "DESCRIPTION": "It's very heavy.", "ATTRIBUTE": [-4, 10], "RARITY": 4}
+  ],
+  "RANGED": [
+    {"NAME": "Simple Bow", "DESCRIPTION": "It is damaged and awkward to use.", "ATTRIBUTE": 2, "RARITY":  20},
+    {"NAME": "Decent Bow", "DESCRIPTION": "It is comfortable to hold.", "ATTRIBUTE": 3, "RARITY": 8},
+    {"NAME": "Strong Bow", "DESCRIPTION": "The bow's limbs are very strong.", "ATTRIBUTE": 7, "RARITY": 3}
+  ],
+  "SHIELD": [
+    {"NAME": "Plank of Wood", "DESCRIPTION": "A broken plank of wood.", "ATTRIBUTE": 1, "RARITY": 40},
+    {"NAME": "Wooden Shield", "DESCRIPTION": "Works better than a plank.", "ATTRIBUTE": 3, "RARITY": 18},
+    {"NAME": "Reinforced Wooden Shield", "DESCRIPTION": "It's assembled with metalic parts, it seems strong.", "ATTRIBUTE": 5, "RARITY": 12},
+    {"NAME": "Iron Shield", "DESCRIPTION": "A fully iron shield.", "ATTRIBUTE": 8, "RARITY": 4}
+  ],
+  "POTION": [
+    {"NAME": "Healing Potion", "DESCRIPTION": "Heals some health", "ATTRIBUTE": [4,12], "RARITY": 4}
+  ],
+  "ITEM": [
+    {"NAME": "Skull", "DESCRIPTION": "Someone has been here before.", "ATTRIBUTE": 0, "RARITY": 6},
+    {"NAME": "Stone", "DESCRIPTION": "It seems like there could be something inside.", "ATTRIBUTE": 0, "RARITY": 10},
+    {"NAME": "Journal", "DESCRIPTION": "Too decayed to read anything.", "ATTRIBUTE": 0, "RARITY": 12},
+    {"NAME": "Bone", "DESCRIPTION": "It could be from a person.", "ATTRIBUTE": 0, "RARITY": 12}
+  ],
+  "ARMOUR": [
+    {"NAME": "Wooden Armour", "DESCRIPTION": "Better than nothing", "ATTRIBUTE": 1, "RARITY": 20},
+    {"NAME": "Reinforced Wooden Armour", "DESCRIPTION": "It's assembled with metalic parts, it seems strong.", "ATTRIBUTE": 3, "RARITY": 12},
+    {"NAME": "Rusty Armour", "DESCRIPTION": "Makes it hard to move.", "ATTRIBUTE": 5, "RARITY": 12},
+    {"NAME": "Iron Armour", "DESCRIPTION": "Only has some rust.", "ATTRIBUTE": 8, "RARITY": 4}
+  ],
+  "KEY": [
+    {"NAME": "Broken Key", "DESCRIPTION": "Too damaged to be useful.", "ATTRIBUTE": 0, "RARITY":  1}
+  ]
+}
+
