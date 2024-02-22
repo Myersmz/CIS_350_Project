@@ -10,6 +10,12 @@
     {"NAME": "Decent Bow", "DESCRIPTION": "It is comfortable to hold.", "ATTRIBUTE": 3, "RARITY": 8},
     {"NAME": "Strong Bow", "DESCRIPTION": "The bow's limbs are very strong.", "ATTRIBUTE": 7, "RARITY": 3}
   ],
+  "STAFF": [
+    {"NAME": "Staff", "DESCRIPTION": "A magical staff for casting spells", "ATTRIBUTE": 12, "RARITY":  20}
+  ],
+  "SPELLBOOK": [
+    {"NAME": "Spellbook", "DESCRIPTION": "A book containing powerful spells", "ATTRIBUTE": 7, "RARITY":  20}
+  ],
   "SHIELD": [
     {"NAME": "Plank of Wood", "DESCRIPTION": "A broken plank of wood.", "ATTRIBUTE": 1, "RARITY": 40},
     {"NAME": "Wooden Shield", "DESCRIPTION": "Works better than a plank.", "ATTRIBUTE": 3, "RARITY": 18},
@@ -23,7 +29,8 @@
     {"NAME": "Skull", "DESCRIPTION": "Someone has been here before.", "ATTRIBUTE": 0, "RARITY": 6},
     {"NAME": "Stone", "DESCRIPTION": "It seems like there could be something inside.", "ATTRIBUTE": 0, "RARITY": 10},
     {"NAME": "Journal", "DESCRIPTION": "Too decayed to read anything.", "ATTRIBUTE": 0, "RARITY": 12},
-    {"NAME": "Bone", "DESCRIPTION": "It could be from a person.", "ATTRIBUTE": 0, "RARITY": 12}
+    {"NAME": "Bone", "DESCRIPTION": "It could be from a person.", "ATTRIBUTE": 0, "RARITY": 12},
+    {"NAME": "Arrows", "DESCRIPTION": "A quiver full of arrows", "ATTRIBUTE": 0, "RARITY": 0}
   ],
   "ARMOUR": [
     {"NAME": "Wooden Armour", "DESCRIPTION": "Better than nothing", "ATTRIBUTE": 1, "RARITY": 20},

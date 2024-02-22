@@ -6,10 +6,12 @@ from enum import Enum
 class ItemTypes(Enum):
     MELEE = 0
     RANGED = 1
-    SHIELD = 2
-    POTION = 3
-    ITEM = 4
-    ARMOUR = 5
+    STAFF = 2
+    SPELLBOOK = 3
+    POTION = 4
+    ITEM = 5
+    SHIELD = 6
+    ARMOUR = 7
     KEY = 10
 
 
@@ -71,3 +73,6 @@ class Item:
             printStr += f"\nDefense: {self.attributeValue}"
 
         return printStr
+
+    def __str__(self):
+        return f"{self.name}: {self.description} ({self.type.name})"
