@@ -2,7 +2,15 @@ import json
 import random
 from enum import Enum
 
+'''
 
+Represent an item object to be utilized in the context of inventory and within environments. 
+Supports creating an item from scratch, or randomly selecting a predefined item from "items.json".
+ 
+'''
+
+
+# Easily represents an item type.
 class ItemTypes(Enum):
     MELEE = 0
     RANGED = 1
@@ -22,14 +30,13 @@ class Item:
         self.description = description
         self.type = item_type
 
-        # attributeValue contains the attribute of the item, based on the item type.
+        # 'attributeValue' contains the attribute of the item, based on the item type.
         # For a sword this value would be the attack buff, and a shield / armour it would be the defense buff.
         # If potions are implemented this could also be used as the health that it would heal.
         self.attributeValue = attribute_value
 
     def generateItem(self, item_type=ItemTypes.ITEM):
-        # Will set values of this object randomly using pre-defined lists of names,
-        # descriptions, and attribute values for a given itemType
+        # Will set values of this object randomly using a pre-defined list.
 
         # item json format
         # {"NAME": "", "DESCRIPTION": "", "ATTRIBUTE": int, "RARITY": int}
@@ -46,12 +53,14 @@ class Item:
         items = json.load(file)
         item_list = items.get(typeString, None)
 
+        # Sums the total weight of items from the list of a single type.
         weight_sum = 0
         for item in item_list:
             weight_sum += item.get("RARITY", 0)
 
         choice = random.randint(1, weight_sum)
 
+        # Run through the list until the value of choice reaches 0 or below.
         for item in item_list:
             choice -= item.get("RARITY", 0)
 
@@ -65,6 +74,8 @@ class Item:
         self.attributeValue = this_item.get("ATTRIBUTE")
         self.type = item_type
 
+    # A slightly decorated way of displaying an item. Uses 3+ lines.
+    # Intended to be used when picking up and item from a room or a monster.
     def display(self):
         printStr = f"--~= {self.name} =~--\n{self.description}\n"
         if self.type in [ItemTypes.MELEE, ItemTypes.RANGED]:
@@ -74,5 +85,6 @@ class Item:
 
         return printStr
 
+    # Single-line representation.
     def __str__(self):
         return f"{self.name}: {self.description} ({self.type.name})"
