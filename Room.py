@@ -30,9 +30,9 @@ class Room:
 
         room.adjacentRooms[(direction + 2) % 4] = self
 
-    def assignRoom(self, room, direction):
-        self.adjacentRooms[direction] = room
-        room.adjacentRooms[(direction + 2) % 4] = self
+    # def assignRoom(self, room, direction):
+    #     self.adjacentRooms[direction] = room
+    #     room.adjacentRooms[(direction + 2) % 4] = self
 
     # 0 is West, 1 is North, 2 is East, 3 is South
     def is_dead_end(self, direction:int):
