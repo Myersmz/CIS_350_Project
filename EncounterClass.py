@@ -54,18 +54,20 @@ class Encounter:
 
     # TODO: possibly add random loot chance or trap?
     def empty_room(self):
-        pass
+        self.is_empty = True
 
     # encounterType rolls 1-3 inculsive
-    def generate_encounter(self, encounter_type = None):
-        if encounter_type == None:
-            self.encounter_type = random.randint(1,3)
+    def generate_encounter(self, encounter_type=None):
+        if encounter_type is None:
+            self.encounter_type = random.randint(1, 3)
         else:
             self.encounter_type = encounter_type
-            
+
         if self.encounter_type == 1:
             self.boss_fight()
-        if self.encounter_type == 2:
+        elif self.encounter_type == 2:
             self.puzzle_room()
-        else:
+        elif self.encounter_type == 3:
             self.empty_room()
+        else:
+            raise ValueError("Invalid encounter type")
