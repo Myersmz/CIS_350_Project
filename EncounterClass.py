@@ -17,7 +17,7 @@ class EncounterTypes(Enum):
 
 
 class Encounter:
-    def __init__(self, encounter_type: int = None):
+    def __init__(self, encounter_type=None):
         self.is_empty = True
 
         # movement options
@@ -70,7 +70,7 @@ class Encounter:
     # encounterType rolls 1-3 inculsive
     def generate_encounter(self, encounter_type=None):
         if encounter_type is None:
-            self.encounter_type = random.randint(1, 3)
+            self.encounter_type = EncounterTypes(random.randint(1, 3))
         else:
             self.encounter_type = encounter_type
 
