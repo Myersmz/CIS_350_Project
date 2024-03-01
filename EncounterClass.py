@@ -1,5 +1,6 @@
 import random
 from characterClass import Character
+from enum import Enum
 
 '''
 
@@ -7,6 +8,13 @@ Represents an encounter in the game, which can be a boss fight, puzzle room, or 
 `boss_fight`, `puzzle_room`, `empty_room`, and `generate_encounter` to create different types of encounters.
 
 '''
+
+
+class EncounterTypes(Enum):
+    PUZZLE = 1
+    BOSS = 2
+    EMPTY = 3
+
 
 class Encounter:
     def __init__(self, encounter_type: int = None):
@@ -31,6 +39,9 @@ class Encounter:
         self.answers = list(self.Riddles.values())
 
         self.generate_encounter(encounter_type)
+        self.puzzle_question = None
+        self.boss = None
+        self.encounter_type = None
 
     # chooses random monster from Monsters list
     def boss_fight(self):
@@ -63,11 +74,11 @@ class Encounter:
         else:
             self.encounter_type = encounter_type
 
-        if self.encounter_type == 1:
+        if self.encounter_type == EncounterTypes.BOSS:
             self.boss_fight()
-        elif self.encounter_type == 2:
+        elif self.encounter_type == EncounterTypes.PUZZLE:
             self.puzzle_room()
-        elif self.encounter_type == 3:
+        elif self.encounter_type == EncounterTypes.EMPTY:
             self.empty_room()
         else:
             raise ValueError("Invalid encounter type")

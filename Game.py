@@ -1,10 +1,13 @@
+import os
+
 from characterClass import Character
 from characterClass import CharacterDeathException
-from EncounterClass import Encounter
+from EncounterClass import *
 from Item import Item
 import pickle
 from Room import Room
 import random
+import time
 
 
 class Game:
@@ -22,39 +25,45 @@ class Game:
 
     def play(self):
         while True:
+            time.sleep(1)
             if not self.game_started:
                 self.startMenu()
             else:
-
                 self.enterRoom()
 
-                choice = input("What would you like to do?: (enter ? for options)").lower()
+                choice = input("What would you like to do?: (enter ? for options)").lower().split(" ")
+                os.system('cls')
 
-                if choice == 'west':
-                    if self.currentRoom.is_dead_end(0):
-                        print('There is no room west of this room.\n')
-                    else:
-                        self.currentRoom = self.currentRoom.adjacentRooms[0]
-                elif choice == 'north':
-                    if self.currentRoom.is_dead_end(1):
-                        print('There is no room north of this room.\n')
-                    else:
-                        self.currentRoom = self.currentRoom.adjacentRooms[1]
-                elif choice == 'east':
-                    if self.currentRoom.is_dead_end(2):
-                        print('There is no room east of this room.\n')
-                    else:
-                        self.currentRoom = self.currentRoom.adjacentRooms[2]
-                elif choice == 'south':
-                    if self.currentRoom.is_dead_end(3):
-                        print('There is no room south of this room.\n')
-                    else:
-                        self.currentRoom = self.currentRoom.adjacentRooms[3]
-                elif choice == '?':
+                command = choice.pop(0)
+                if command == 'move':
+                    match choice[0] if len(choice) > 0 else "":
+                        case "west":
+                            if self.currentRoom.is_dead_end(0):
+                                print('There is no room west of this room.\n')
+                            else:
+                                self.currentRoom = self.currentRoom.adjacentRooms[0]
+                        case "north":
+                            if self.currentRoom.is_dead_end(1):
+                                print('There is no room north of this room.\n')
+                            else:
+                                self.currentRoom = self.currentRoom.adjacentRooms[1]
+                        case "east":
+                            if self.currentRoom.is_dead_end(2):
+                                print('There is no room east of this room.\n')
+                            else:
+                                self.currentRoom = self.currentRoom.adjacentRooms[2]
+                        case "south":
+                            if self.currentRoom.is_dead_end(3):
+                                print('There is no room south of this room.\n')
+                            else:
+                                self.currentRoom = self.currentRoom.adjacentRooms[3]
+                        case _:
+                            print("Please enter a direction with the command.")
+                elif command == '?':
                     self.printChoices()
-                elif choice == 'pickup':
+                elif command == 'pickup':
                     pass
-                elif choice == 'attack':
+                elif command == 'attack':
                     if self.currentRoom.encounter.encounter_type == 1 and not self.currentRoom.encounter.is_empty:
                         try:
                             self.currentRoom.encounter.boss.take_damage(self.player)
@@ -63,16 +72,16 @@ class Game:
                             self.currentRoom.encounter.is_empty = True
                     else:
                         print("There is no monster to attack\n")
-                elif choice == 'stats':
+                elif command == 'stats':
                     self.player.print_character_info()
-                elif choice == 'save':
+                elif command == 'save':
                     self.save()
-                elif choice == 'quit':
-                    user_input = input("would you like to save before quitting?: (y for yes, n for no)").lower()
+                elif command == 'quit':
+                    user_input = input("Would you like to save before quitting?: (y for yes, n for no)").lower()
                     if user_input == 'y':
                         self.save()
                     quit()
-                elif choice == 'guess':
+                elif command == 'guess':
                     if self.currentRoom.encounter.encounter_type == 2 and not self.currentRoom.encounter.is_empty:
                         self.puzzle_guess()
                     else:
@@ -92,7 +101,7 @@ class Game:
     def enterRoom(self):
         if self.currentRoom.encounter.is_empty:
             print('You encounter an empty room')
-        elif self.currentRoom.encounter.encounter_type == 1: # boss fight
+        elif self.currentRoom.encounter.encounter_type == EncounterTypes.BOSS:
             print(f'You encounter a {self.currentRoom.encounter.boss.name}')
             try:
                 self.player.take_damage(self.currentRoom.encounter.boss)
@@ -101,23 +110,21 @@ class Game:
                 self.game_started = False
                 self.startMenu()
 
-        elif self.currentRoom.encounter.encounter_type == 2: # puzzle
+        elif self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE:
             print(f'You encounter a puzzle room: {self.currentRoom.encounter.puzzle_question}')
 
         print(f'There are rooms to the {self.currentRoom.directions()} of this room\n')
 
     def printChoices(self):
-        print('\nwest - to go to the room to the west')
-        print('north - to go to the room to the north')
-        print('east - to go to the room to the east')
-        print('south - to go to the room to the south')
-        print('? - to get command options')
-        print('pickup - to pickup an item in a room')
-        print('attack - attack any monster in the room')
-        print('stats - print out character stats')
-        print('save - save the game')
-        print('quit - quit the game')
-        print('guess - guess in a puzzle room\n')
+        print("\nMove - move to another room")
+        print('Pickup - Pickup an item in a room')
+        print('Attack - attack any monster in the room')
+        print('Stats - print out character stats')
+        print('Save - save the game')
+        print('Quit - quit the game')
+
+        if self.currentRoom.encounter == EncounterTypes.PUZZLE:
+            print('Guess - guess in a puzzle room\n')
 
     def startMenu(self):
         print("\nWelcome to the Run Escape!")
@@ -126,6 +133,7 @@ class Game:
         print("Press Q to quit\n")
 
         choice = input("Enter your choice: ").lower()
+        os.system('cls')
 
         if choice == 'p':
             print("Starting new game...\n")
@@ -151,7 +159,6 @@ class Game:
         pickle.dump(saveObject, open("savefile", "wb"))
 
     def load(self):
-
         # Loads the saveObject dictionary from a savefile-file in the working directory.
         try:
             Object = pickle.load(open("savefile", "rb"))
@@ -164,7 +171,12 @@ class Game:
             print("Encountered an error while loading the savefile.\n")
 
     def createPlayer(self):
-        self.player = Character('Mike1', 1000, 1000, 20)
+        name = ""
+        while name == "":
+            name = input("Enter your name, hero: ")
+        os.system('cls')
+
+        self.player = Character(name, 25, 4, 4)
 
     def generateRooms(self):
         self.currentRoom = Room("Entrance")
