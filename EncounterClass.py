@@ -2,13 +2,6 @@ import random
 from characterClass import Character
 from enum import Enum
 
-'''
-
-Represents an encounter in the game, which can be a boss fight, puzzle room, or an empty room. Has methods like 
-`boss_fight`, `puzzle_room`, `empty_room`, and `generate_encounter` to create different types of encounters.
-
-'''
-
 
 class EncounterTypes(Enum):
     PUZZLE = 1
@@ -17,6 +10,10 @@ class EncounterTypes(Enum):
 
 
 class Encounter:
+    """
+    Represents an encounter in the game, which can be a boss fight, puzzle room, or an empty room. Has methods like
+    `boss_fight`, `puzzle_room`, `empty_room`, and `generate_encounter` to create different types of encounters.
+    """
     def __init__(self, encounter_type=None):
         self.is_empty = True
 
@@ -38,10 +35,10 @@ class Encounter:
         self.questions = list(self.Riddles.keys())
         self.answers = list(self.Riddles.values())
 
-        self.generate_encounter(encounter_type)
         self.puzzle_question = None
         self.boss = None
         self.encounter_type = None
+        self.generate_encounter(encounter_type)
 
     # chooses random monster from Monsters list
     def boss_fight(self):
@@ -72,13 +69,11 @@ class Encounter:
         if encounter_type is None:
             self.encounter_type = EncounterTypes(random.randint(1, 3))
         else:
-            self.encounter_type = encounter_type
+            self.encounter_type = EncounterTypes(encounter_type)
 
         if self.encounter_type == EncounterTypes.BOSS:
             self.boss_fight()
         elif self.encounter_type == EncounterTypes.PUZZLE:
             self.puzzle_room()
-        elif self.encounter_type == EncounterTypes.EMPTY:
-            self.empty_room()
         else:
-            raise ValueError("Invalid encounter type")
+            self.empty_room()

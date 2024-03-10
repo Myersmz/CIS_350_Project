@@ -1,7 +1,7 @@
 import random
 import unittest
 
-from EncounterClass import Encounter
+from EncounterClass import *
 
 
 class EncounterTester(unittest.TestCase):
@@ -14,14 +14,14 @@ class EncounterTester(unittest.TestCase):
         """Ensures valid and invalid encounter types are handled correctly."""
 
         # Test valid types
-        enc1 = Encounter(1)
-        self.assertEqual(enc1.encounter_type, 1)
+        enc1 = Encounter(EncounterTypes.BOSS)
+        self.assertEqual(enc1.encounter_type, EncounterTypes.BOSS)
         self.assertFalse(enc1.is_empty)  # Boss fight is not an empty room
-        enc2 = Encounter(2)
-        self.assertEqual(enc2.encounter_type, 2)
+        enc2 = Encounter(EncounterTypes.PUZZLE)
+        self.assertEqual(enc2.encounter_type, EncounterTypes.PUZZLE)
         self.assertFalse(enc2.is_empty)  # Puzzle room is not an empty room
-        enc3 = Encounter(3)
-        self.assertEqual(enc3.encounter_type, 3)
+        enc3 = Encounter(EncounterTypes.EMPTY)
+        self.assertEqual(enc3.encounter_type, EncounterTypes.EMPTY)
         self.assertTrue(enc3.is_empty)  # Empty room is empty
 
         # Test invalid types
@@ -35,17 +35,17 @@ class EncounterTester(unittest.TestCase):
         # Repeated tests increase coverage
         for _ in range(10):
             enc = Encounter()
-            self.assertTrue(enc.encounter_type in (1, 2, 3))
-            if enc.encounter_type == 1:
+            self.assertTrue(enc.encounter_type in EncounterTypes)
+            if enc.encounter_type == EncounterTypes.BOSS:
                 self.assertFalse(enc.is_empty)  # Boss fight is not an empty room
-            elif enc.encounter_type == 2:
+            elif enc.encounter_type == EncounterTypes.PUZZLE:
                 self.assertFalse(enc.is_empty)  # Puzzle room is not an empty room
             else:
                 self.assertTrue(enc.is_empty)  # Empty room is empty
 
     def test_boss_fight(self):
         """Asserts that boss fights generate appropriate monsters."""
-        enc = Encounter(1)
+        enc = Encounter(EncounterTypes.BOSS)
         enc.boss_fight()
 
         # Check monster scaling (might need adjustment based on your logic)
@@ -58,7 +58,7 @@ class EncounterTester(unittest.TestCase):
 
     def test_puzzle_room(self):
         """Verifies that puzzle rooms generate valid questions and answers."""
-        enc = Encounter(2)
+        enc = Encounter(EncounterTypes.PUZZLE)
         enc.puzzle_room()
 
         # Check that the question and its answer are consistent
@@ -70,20 +70,20 @@ class EncounterTester(unittest.TestCase):
 
         # Test boss fight
         enc = Encounter()
-        enc.generate_encounter(1)
-        self.assertEqual(enc.encounter_type, 1)
+        enc.generate_encounter(EncounterTypes.BOSS)
+        self.assertEqual(enc.encounter_type, EncounterTypes.BOSS)
         self.assertFalse(enc.is_empty)  # Boss fight is not an empty room
 
         # Test puzzle room
         enc = Encounter()
-        enc.generate_encounter(2)
-        self.assertEqual(enc.encounter_type, 2)
+        enc.generate_encounter(EncounterTypes.PUZZLE)
+        self.assertEqual(enc.encounter_type, EncounterTypes.PUZZLE)
         self.assertFalse(enc.is_empty)  # Puzzle room is not an empty room
 
         # Test empty room
         enc = Encounter()
-        enc.generate_encounter(3)
-        self.assertEqual(enc.encounter_type, 3)
+        enc.generate_encounter(EncounterTypes.EMPTY)
+        self.assertEqual(enc.encounter_type, EncounterTypes.EMPTY)
         self.assertTrue(enc.is_empty)  # Empty room is empty
 
 
