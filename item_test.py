@@ -134,6 +134,13 @@ class MyTestCase(unittest.TestCase):
         expectedString = f"--~= {item.name} =~--\n{item.description}\n"
         self.assertEqual(item.display(), expectedString)
 
+    def test_str_cast(self):
+        item = Item()
+        item.generateItem(ItemTypes.ITEM)
+
+        expectedString = f"{item.name}: {item.description} ({item.type.name})"
+        self.assertEqual(str(item), expectedString)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -2,13 +2,6 @@ import json
 import random
 from enum import Enum
 
-'''
-
-Represent an item object to be utilized in the context of inventory and within environments. 
-Supports creating an item from scratch, or randomly selecting a predefined item from "items.json".
- 
-'''
-
 
 # Easily represents an item type.
 class ItemTypes(Enum):
@@ -23,8 +16,11 @@ class ItemTypes(Enum):
     KEY = 10
 
 
-# Represents an item. Assignable values: name, description, item_type, attribute_value. No argument is required.
 class Item:
+    """
+    Represent an item object to be utilized in the context of inventory and within environments.
+    Supports creating an item from scratch, or randomly selecting a predefined item from "items.json".
+    """
     def __init__(self, name="Unknown Item", description="Indescribable", item_type=ItemTypes.ITEM, attribute_value=0):
         self.name = name
         self.description = description
@@ -33,22 +29,22 @@ class Item:
         # 'attributeValue' contains the attribute of the item, based on the item type.
         # For a sword this value would be the attack buff, and a shield / armour it would be the defense buff.
         # If potions are implemented this could also be used as the health that it would heal.
+        # It is possible for this value to be a list of 2 values to represent a range of its value.
         self.attributeValue = attribute_value
 
     def generateItem(self, item_type=ItemTypes.ITEM):
-        # Will set values of this object randomly using a pre-defined list.
+        """
+        Will set values of this object randomly using a pre-defined list.
+        :param item_type: Type of item to get.
+        :return:
+        """
 
         # item json format
         # {"NAME": "", "DESCRIPTION": "", "ATTRIBUTE": int, "RARITY": int}
         typeString = str(item_type)[10:]
         this_item = None
 
-        file = None
-        try:
-            file = open("items.json", "r")
-        except:
-            print("Failed to load items.")
-            raise FileNotFoundError
+        file = open("items.json", "r")
 
         items = json.load(file)
         item_list = items.get(typeString, None)
@@ -74,9 +70,12 @@ class Item:
         self.attributeValue = this_item.get("ATTRIBUTE")
         self.type = item_type
 
-    # A slightly decorated way of displaying an item. Uses 3+ lines.
-    # Intended to be used when picking up and item from a room or a monster.
     def display(self):
+        """
+        A slightly decorated way of displaying an item. Uses 3+ lines.
+        Intended to be used when picking up an item from a room or a monster.
+        :return:
+        """
         printStr = f"--~= {self.name} =~--\n{self.description}\n"
         if self.type in [ItemTypes.MELEE, ItemTypes.RANGED]:
             printStr += f"\nAttack: {self.attributeValue}"
@@ -85,6 +84,9 @@ class Item:
 
         return printStr
 
-    # Single-line representation.
     def __str__(self):
+        """
+        Single-line representation.
+        :return:
+        """
         return f"{self.name}: {self.description} ({self.type.name})"
