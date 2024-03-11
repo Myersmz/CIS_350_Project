@@ -6,7 +6,8 @@ from enum import Enum
 class EncounterTypes(Enum):
     PUZZLE = 1
     BOSS = 2
-    EMPTY = 3
+    TRAP = 3
+    EMPTY = 4
 
 
 class Encounter:
@@ -31,13 +32,26 @@ class Encounter:
                         "What is full of holes but still holds water?": "sponge",
                         "What question can you never answer yes to?": "are you asleep"}
 
+        # problems = keys
+        # solutions = values
+        self.Problems = {"What is 2+96+7?": "105",
+                         "What is 5+19+3?": "27",
+                         "What is 3 + 9 + 45?": "57",
+                         "What is 8 + 2 + 18?": "28",
+                         "What is 5 + 6 + 23?": "34"}
+
         # lists for Q/A's
         self.questions = list(self.Riddles.keys())
         self.answers = list(self.Riddles.values())
 
+        # lists for Trap Problems
+        self.issues = list(self.Problems.keys())
+        self.solutions = list(self.Problems.values())
+
         self.puzzle_question = None
         self.boss = None
         self.encounter_type = None
+        self.door = None
         self.generate_encounter(encounter_type)
 
     # chooses random monster from Monsters list
@@ -60,14 +74,23 @@ class Encounter:
         self.is_empty = False
         self.puzzle_question = random.choice(self.questions)
 
+    # chooses random math problem
+    def trap_room(self):
+        self.is_empty = False
+        self.trap_problem = random.choice(self.issues)
+
+        # creates door object to be broken open
+        self.door = Character('Door', 15, 0, 0)
+
+
     # TODO: possibly add random loot chance or trap?
     def empty_room(self):
         self.is_empty = True
 
-    # encounterType rolls 1-3 inculsive
+    # encounterType rolls 1-4 inculsive
     def generate_encounter(self, encounter_type=None):
         if encounter_type is None:
-            self.encounter_type = EncounterTypes(random.randint(1, 3))
+            self.encounter_type = EncounterTypes(random.randint(1, 4))
         else:
             self.encounter_type = EncounterTypes(encounter_type)
 
@@ -75,5 +98,7 @@ class Encounter:
             self.boss_fight()
         elif self.encounter_type == EncounterTypes.PUZZLE:
             self.puzzle_room()
+        elif self.encounter_type == EncounterTypes.TRAP:
+            self.trap_room()
         else:
             self.empty_room()
