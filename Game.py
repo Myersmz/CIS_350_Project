@@ -40,21 +40,29 @@ class Game:
                         case "west":
                             if self.currentRoom.is_dead_end(0):
                                 print('There is no room west of this room.\n')
+                            elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
+                                print("You cannot go west because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
                             else:
                                 self.currentRoom = self.currentRoom.adjacentRooms[0]
                         case "north":
                             if self.currentRoom.is_dead_end(1):
                                 print('There is no room north of this room.\n')
+                            elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
+                                print("You cannot go north because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
                             else:
                                 self.currentRoom = self.currentRoom.adjacentRooms[1]
                         case "east":
                             if self.currentRoom.is_dead_end(2):
                                 print('There is no room east of this room.\n')
+                            elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
+                                print("You cannot go east because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
                             else:
                                 self.currentRoom = self.currentRoom.adjacentRooms[2]
                         case "south":
                             if self.currentRoom.is_dead_end(3):
                                 print('There is no room south of this room.\n')
+                            elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
+                                print("You cannot go south because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
                             else:
                                 self.currentRoom = self.currentRoom.adjacentRooms[3]
                         case _:
@@ -71,6 +79,13 @@ class Game:
                         except CharacterDeathException:
                             print(f'The {self.currentRoom.encounter.boss.name} has been slain !!!')
                             self.currentRoom.encounter.is_empty = True
+                    elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP \
+                              and not self.currentRoom.encounter.is_empty:
+                        try:
+                            self.currentRoom.encounter.door.take_damage(self.player)
+                        except CharacterDeathException:
+                            print(f'The door splinters open and you are free to leave the room !!!')
+                            self.currentRoom.encounter.is_empty = True
                     else:
                         print("There is no monster to attack\n")
                 elif command == 'stats':
@@ -86,6 +101,9 @@ class Game:
                     if self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE \
                             and not self.currentRoom.encounter.is_empty:
                         self.puzzle_guess()
+                    elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP \
+                            and not self.currentRoom.encounter.is_empty:
+                        self.trap_guess()
                     else:
                         print("There is no unsolved puzzle in this room\n")
                 else:
@@ -99,6 +117,16 @@ class Game:
             # TODO: possibly add reward item
         else:
             print('\nHm, not quite.\n')
+
+
+    def trap_guess(self):
+        user_input = input('Solution: ')
+        if user_input.lower().strip() in self.currentRoom.encounter.solutions:
+            print('\nThe doors quickly swing open and you are free to leave!!!\n')
+            self.currentRoom.encounter.is_empty = True
+        else:
+            print('\nThe doors remain firmly in place, it seems that was not quite the answer.\n')
+
 
     def enterRoom(self):
         if self.currentRoom.encounter.is_empty:
@@ -114,6 +142,13 @@ class Game:
 
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE:
             print(f'You encounter a puzzle room: {self.currentRoom.encounter.puzzle_question}')
+
+        elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP:
+            print(f'The doors have quickly shut, trapping you in the room.\n'
+                  f'You see a puzzle that seems to be connected to the doors\n'
+                  f'The puzzle could probably open them, but the doors themselves\n'
+                  f'Also look like they could be broken if you attacked them enough')
+            print(f'{self.currentRoom.encounter.trap_problem}')
 
         print(f'There are rooms to the {self.currentRoom.directions()} of this room\n')
 
