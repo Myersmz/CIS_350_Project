@@ -64,7 +64,8 @@ class Game:
                 elif command == 'pickup':
                     pass
                 elif command == 'attack':
-                    if self.currentRoom.encounter.encounter_type == 1 and not self.currentRoom.encounter.is_empty:
+                    if self.currentRoom.encounter.encounter_type == EncounterTypes.BOSS \
+                            and not self.currentRoom.encounter.is_empty:
                         try:
                             self.currentRoom.encounter.boss.take_damage(self.player)
                         except CharacterDeathException:
