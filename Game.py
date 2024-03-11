@@ -178,7 +178,7 @@ class Game:
             name = input("Enter your name, hero: ")
         os.system('cls')
 
-        self.player = Character(name, 25, 4, 4)
+        self.player = Character(name, 25, 6, 4)
 
     def generateRooms(self):
         self.currentRoom = Room("Entrance")

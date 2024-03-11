@@ -25,11 +25,11 @@ class Encounter:
 
         # questions = keys
         # answers = values
-        self.Riddles = {"What has to be broken before it can be used?": "an egg",
-                        "I'm tall when I'm young, and I'm short when I'm old. What am I?": "a candle",
+        self.Riddles = {"What has to be broken before it can be used?": "egg",
+                        "I'm tall when I'm young, and I'm short when I'm old. What am I?": "candle",
                         "What month of the year has 28 days?": "all of them",
-                        "What is full of holes but still holds water?": "a sponge",
-                        "What question can you never answer yes to?": "are you asleep?"}
+                        "What is full of holes but still holds water?": "sponge",
+                        "What question can you never answer yes to?": "are you asleep"}
 
         # lists for Q/A's
         self.questions = list(self.Riddles.keys())
@@ -48,9 +48,9 @@ class Encounter:
         boss_name = random.choice(self.Monsters)
 
         # scale boss stats according to current player stats
-        monster_health = 150
-        monster_attack = 25
-        monster_defense = 25
+        monster_health = random.randint(15, 25)
+        monster_attack = random.randint(3, 6)
+        monster_defense = random.randint(0, 4)
 
         # create boss object
         self.boss = Character(boss_name, monster_health, monster_attack, monster_defense)
