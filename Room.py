@@ -4,7 +4,9 @@ from Item import Item
 
 class Room:
 
-    def __init__(self, name, left=None, up=None, right=None, down=None, items=None, position=[0, 0]):
+    def __init__(self, name, left=None, up=None, right=None, down=None, items=None, position=None):
+        if position is None:
+            position = [0, 0]
         if items is None:
             items = []
         self.name = name

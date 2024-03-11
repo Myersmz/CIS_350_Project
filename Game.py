@@ -31,7 +31,7 @@ class Game:
             else:
                 self.enterRoom()
 
-                choice = input("What would you like to do?: (enter ? for options)").lower().split(" ")
+                choice = input("What would you like to do? (? for help): ").lower().split(" ")
                 os.system('cls')
 
                 command = choice.pop(0)
@@ -82,7 +82,8 @@ class Game:
                         self.save()
                     quit()
                 elif command == 'guess':
-                    if self.currentRoom.encounter.encounter_type == 2 and not self.currentRoom.encounter.is_empty:
+                    if self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE \
+                            and not self.currentRoom.encounter.is_empty:
                         self.puzzle_guess()
                     else:
                         print("There is no unsolved puzzle in this room\n")
@@ -117,13 +118,13 @@ class Game:
 
     def printChoices(self):
         print("\nMove - move to another room")
-        print('Pickup - Pickup an item in a room')
+        print('Pickup - pickup an item in a room')
         print('Attack - attack any monster in the room')
         print('Stats - print out character stats')
         print('Save - save the game')
         print('Quit - quit the game')
 
-        if self.currentRoom.encounter == EncounterTypes.PUZZLE:
+        if self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE:
             print('Guess - guess in a puzzle room\n')
 
     def startMenu(self):
