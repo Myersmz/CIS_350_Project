@@ -80,14 +80,14 @@ class Room:
                 self.items.remove(i)
                 return i
 
-    def add_item(self, item: Item):
-         """
-         This function is for adding an item to a room will be used in future release.
-         """
-         if isinstance(item, Item):
-             self.items.append(item)
-         else:
-             raise(TypeError, "Not a valid item")
+    #def add_item(self, item: Item):
+    #     """
+    #     This function is for adding an item to a room will be used in future release.
+    #     """
+    #     if isinstance(item, Item):
+    #         self.items.append(item)
+    #     else:
+    #         raise(TypeError, "Not a valid item")
          
     def directions(self):
         """
