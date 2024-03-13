@@ -67,18 +67,18 @@ class Room:
         else:
             return True
 
-    def grab_item(self, item_name : str):
-        """
-        This function is for checking for and taking an item out of a room. currently not implemented.
-        """
-
-        if not isinstance(item_name, str):
-            raise TypeError("Item_name should be a string")
-
-        for i in self.items:
-            if i.name == item_name:
-                self.items.remove(i)
-                return i
+    # def grab_item(self, item_name : str):
+    #    """
+    #    This function is for checking for and taking an item out of a room. currently not implemented.
+    #    """
+    #
+    #   if not isinstance(item_name, str):
+    #        raise TypeError("Item_name should be a string")
+    #
+    #   for i in self.items:
+    #      if i.name == item_name:
+    #           self.items.remove(i)
+    #          return i
 
     #def add_item(self, item: Item):
     #     """
