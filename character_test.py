@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 from io import StringIO
-from characterClass import Character, CharacterDeathException
+from character import Character, CharacterDeathException
 
 class TestCharacter(unittest.TestCase):
 

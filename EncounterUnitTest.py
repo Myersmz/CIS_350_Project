@@ -1,7 +1,7 @@
 import random
 import unittest
 
-from EncounterClass import *
+from encounter import *
 
 
 class EncounterTester(unittest.TestCase):
