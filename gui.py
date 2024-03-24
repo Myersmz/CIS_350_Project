@@ -22,14 +22,13 @@ class Gui():
         self.screen_menu = tk.Tk()
         self.screen_menu.geometry("500x500")
         self.screen_menu.title("Start Menu")
-
         label_intro = tk.Label(self.screen_menu, text = "Welcome to Run Escape! Select an Option Below")
         label_intro.grid(row = 0, padx = 2, pady = 2)
         button_play = tk.Button(self.screen_menu, text = "Play", command = self.play)
         button_play.grid(row = 1, padx = 2, pady = 2)
         button_load = tk.Button(self.screen_menu, text = "Load", command = self.load)
         button_load.grid(row = 2, padx = 2, pady = 2)
-        button_quit = tk.Button(self.screen_menu, text = "Quit", command = self.quit)
+        button_quit = tk.Button(self.screen_menu, text = "Quit", command = quit)
         button_quit.grid(row = 3, padx = 2, pady = 2)
         self.screen_menu.mainloop()
 
@@ -291,7 +290,7 @@ class Gui():
         button_quit = tk.Button(self.menu_window, text = 'Quit', command = self.quit)
         button_quit.grid(row = 2)
         
-        button_return = tk.Button(self.menu_window, text = 'Return to Game', command = self.return_to_game)
+        button_return = tk.Button(self.menu_window, text = 'Return to Game', command = self.menu_window.destroy)
         button_return.grid(row = 3)
 
     def save(self):
@@ -304,9 +303,6 @@ class Gui():
         # Dumps the saveObject to the working directory of the script.
         pickle.dump(saveObject, open("savefile", "wb"))
         messagebox.showinfo('Success', message = 'Save Successful')
-
-    def return_to_game(self):
-        self.menu_window.destroy()
 
     def generateRooms(self):
         self.currentRoom = Room("Entrance")
