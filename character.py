@@ -63,6 +63,10 @@ class Character:
         print("Character Defense:", self.base_defense)
         print("Character Inventory:", self.inventory)
 
+    def get_character_info(self):
+        return f"Character Name: {self.name}\nCharacter Health: {self.health}\nCharacter Attack: {self.base_attack}\nCharacter Defense: {self.base_defense}\nCharacter Inventory: {self.inventory}"
+    
+
     # Causes damage from one character to another, based on their attack and defense stats.
     def get_attacked(self, attacker):
         damage = attacker.get_attack()
