@@ -84,6 +84,16 @@ class Item:
 
         return printStr
 
+    def get_attribute(self) -> int:
+        """
+        Returns a value for this items attribute. Since attributeValue can be a list for a range,
+        this method standardizes how that is handled.
+        :return:
+        """
+        if type(self.attributeValue) == list:
+            return random.randint(self.attributeValue[0], self.attributeValue[1])
+        return self.attributeValue
+
     def __str__(self):
         """
         Single-line representation.

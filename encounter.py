@@ -1,5 +1,5 @@
 import random
-from characterClass import Character
+from character import Character
 from enum import Enum
 
 

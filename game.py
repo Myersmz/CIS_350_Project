@@ -1,11 +1,10 @@
 import os
 
-from characterClass import Character
-from characterClass import CharacterDeathException
-from EncounterClass import *
-from Item import Item
+from character import *
+from encounter import *
+from room import *
+from item import *
 import pickle
-from Room import Room
 import random
 import time
 
@@ -75,14 +74,14 @@ class Game:
                     if self.currentRoom.encounter.encounter_type == EncounterTypes.BOSS \
                             and not self.currentRoom.encounter.is_empty:
                         try:
-                            self.currentRoom.encounter.boss.take_damage(self.player)
+                            self.currentRoom.encounter.boss.get_attacked(self.player)
                         except CharacterDeathException:
                             print(f'The {self.currentRoom.encounter.boss.name} has been slain !!!')
                             self.currentRoom.encounter.is_empty = True
                     elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP \
                               and not self.currentRoom.encounter.is_empty:
                         try:
-                            self.currentRoom.encounter.door.take_damage(self.player)
+                            self.currentRoom.encounter.door.get_attacked(self.player)
                         except CharacterDeathException:
                             print(f'The door splinters open and you are free to leave the room !!!')
                             self.currentRoom.encounter.is_empty = True
@@ -134,7 +133,7 @@ class Game:
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.BOSS:
             print(f'You encounter a {self.currentRoom.encounter.boss.name}')
             try:
-                self.player.take_damage(self.currentRoom.encounter.boss)
+                self.player.get_attacked(self.currentRoom.encounter.boss)
             except CharacterDeathException:
                 print('\nYou have died!!!')
                 self.game_started = False

@@ -1,5 +1,5 @@
-from EncounterClass import Encounter
-from Item import Item
+from encounter import Encounter
+from item import Item
 
 
 class Room:
