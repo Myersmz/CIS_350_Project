@@ -1,13 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
-import os
 from character import *
 from encounter import *
 from room import *
 from item import *
 import pickle
 import random
-import time
 
 class Gui():
 
@@ -64,7 +62,8 @@ class Gui():
             self.currentRoom = Object.get("Rooms", None)
             self.player = Object.get("Player", None)
             self.game_started = True
-            self.enterRoom()
+            self.screen_menu.destroy()
+            self.game_screen()
         except FileNotFoundError:
             messagebox.showerror("Error", message = "Encountered an error while loading the savefile.")
 
@@ -260,6 +259,7 @@ class Gui():
         self.enterRoom()
 
     def pickup(self):
+        # TODO add functionality
         messagebox.showerror("Error", message = 'Not implemented yet')
 
     def inventory(self):
@@ -268,6 +268,7 @@ class Gui():
         self.inventory_window.title("Inventory Menu")
         label_inventory = tk.Label(self.inventory_window, text = self.player.inventory)
         label_inventory.pack()
+        # TODO add drop, equip and use buttons
 
     def stats(self):
         self.stats_window = tk.Toplevel()
