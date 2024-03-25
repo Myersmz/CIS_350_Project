@@ -110,22 +110,22 @@ class Game:
 
     def puzzle_guess(self):
         user_input = input('Answer: ')
-        if user_input.lower().strip() in self.currentRoom.encounter.answers:
+        if user_input.lower().strip() == self.currentRoom.encounter.answers[
+            self.currentRoom.encounter.questions.index(self.currentRoom.encounter.puzzle_question)]:
             print('\nWell done!\n')
             self.currentRoom.encounter.is_empty = True
             # TODO: possibly add reward item
         else:
             print('\nHm, not quite.\n')
 
-
     def trap_guess(self):
         user_input = input('Solution: ')
-        if user_input.lower().strip() in self.currentRoom.encounter.solutions:
+        if user_input.lower().strip() == self.currentRoom.encounter.solutions[
+            self.currentRoom.encounter.issues.index(self.currentRoom.encounter.trap_problem)]:
             print('\nThe doors quickly swing open and you are free to leave!!!\n')
             self.currentRoom.encounter.is_empty = True
         else:
             print('\nThe doors remain firmly in place, it seems that was not quite the answer.\n')
-
 
     def enterRoom(self):
         if self.currentRoom.encounter.is_empty:
