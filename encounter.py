@@ -7,7 +7,8 @@ class EncounterTypes(Enum):
     PUZZLE = 1
     BOSS = 2
     TRAP = 3
-    EMPTY = 4
+    STORE = 4
+    EMPTY = 10
 
 
 class Encounter:

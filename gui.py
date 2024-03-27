@@ -7,6 +7,7 @@ from item import *
 import pickle
 import random
 
+
 class Gui():
 
     def __init__(self):
@@ -20,14 +21,14 @@ class Gui():
         self.screen_menu = tk.Tk()
         self.screen_menu.geometry("500x500")
         self.screen_menu.title("Start Menu")
-        label_intro = tk.Label(self.screen_menu, text = "Welcome to Run Escape! Select an Option Below")
-        label_intro.grid(row = 0, padx = 2, pady = 2)
-        button_play = tk.Button(self.screen_menu, text = "Play", command = self.play)
-        button_play.grid(row = 1, padx = 2, pady = 2)
-        button_load = tk.Button(self.screen_menu, text = "Load", command = self.load)
-        button_load.grid(row = 2, padx = 2, pady = 2)
-        button_quit = tk.Button(self.screen_menu, text = "Quit", command = quit)
-        button_quit.grid(row = 3, padx = 2, pady = 2)
+        label_intro = tk.Label(self.screen_menu, text="Welcome to Run Escape! Select an Option Below")
+        label_intro.grid(row=0, padx=2, pady=2)
+        button_play = tk.Button(self.screen_menu, text="Play", command=self.play)
+        button_play.grid(row=1, padx=2, pady=2)
+        button_load = tk.Button(self.screen_menu, text="Load", command=self.load)
+        button_load.grid(row=2, padx=2, pady=2)
+        button_quit = tk.Button(self.screen_menu, text="Quit", command=quit)
+        button_quit.grid(row=3, padx=2, pady=2)
         self.screen_menu.mainloop()
 
     def play(self):
@@ -35,14 +36,14 @@ class Gui():
         self.character_creation_window.geometry("400x300")
         self.character_creation_window.title("Character Creation")
 
-        label_name = tk.Label(self.character_creation_window, text = "Name: ")
-        label_name.grid(row = 0, column = 0)
+        label_name = tk.Label(self.character_creation_window, text="Name: ")
+        label_name.grid(row=0, column=0)
 
         self.entry_name = tk.Entry(self.character_creation_window)
-        self.entry_name.grid(row = 0, column = 1)
+        self.entry_name.grid(row=0, column=1)
 
-        button_enter = tk.Button(self.character_creation_window, text = 'Enter', command = self.get_name)
-        button_enter.grid(row = 1, columnspan = 2)
+        button_enter = tk.Button(self.character_creation_window, text='Enter', command=self.get_name)
+        button_enter.grid(row=1, columnspan=2)
 
     def get_name(self):
         self.player = Character(self.entry_name.get(), 25, 6, 4)
@@ -65,101 +66,105 @@ class Gui():
             self.screen_menu.destroy()
             self.game_screen()
         except FileNotFoundError:
-            messagebox.showerror("Error", message = "Encountered an error while loading the savefile.")
+            messagebox.showerror("Error", message="Encountered an error while loading the savefile.")
 
     def quit(self):
         self.quit_window = tk.Toplevel()
         self.quit_window.geometry("400x300")
         self.quit_window.title("Quit Menu")
-        label_quit = tk.Label(self.quit_window, text = "Would you like to save before quitting?")
+        label_quit = tk.Label(self.quit_window, text="Would you like to save before quitting?")
 
-        label_quit.grid(row = 0, column = 0, columnspan= 2, padx = 2, pady = 2)
+        label_quit.grid(row=0, column=0, columnspan=2, padx=2, pady=2)
 
-        button_yes = tk.Button(self.quit_window, text = "Yes", command = self.save_and_quit)
-        button_yes.grid(row = 1, column = 0, padx = 2, pady = 2)
+        button_yes = tk.Button(self.quit_window, text="Yes", command=self.save_and_quit)
+        button_yes.grid(row=1, column=0, padx=2, pady=2)
 
-        button_no = tk.Button(self.quit_window, text = "No", command = quit)
-        button_no.grid(row = 1, column = 1, padx = 2, pady = 2)
-        
+        button_no = tk.Button(self.quit_window, text="No", command=quit)
+        button_no.grid(row=1, column=1, padx=2, pady=2)
+
     def save_and_quit(self):
         self.save()
         quit()
-        
+
     def game_screen(self):
         self.screen_game = tk.Tk()
         self.screen_game.geometry("700x700")
         self.screen_game.title("Run Escape")
 
-        self.label = tk.Label(self.screen_game, text = "Hello World")
-        self.label.grid(row = 0, column = 0, columnspan= 8, padx = 2, pady = 2)
+        self.label = tk.Label(self.screen_game, text="Hello World")
+        self.label.grid(row=0, column=0, columnspan=8, padx=2, pady=2)
 
-        self.label2 = tk.Label(self.screen_game, text = "Hello World")
-        self.label2.grid(row = 1, column = 0, columnspan= 8, padx = 2, pady = 2)
+        self.label2 = tk.Label(self.screen_game, text="Hello World")
+        self.label2.grid(row=1, column=0, columnspan=8, padx=2, pady=2)
 
-        button_west = tk.Button(self.screen_game, text = "West", command = self.west)
-        button_west.grid(row = 4, column = 5, padx = 2, pady = 2)
+        button_west = tk.Button(self.screen_game, text="West", command=self.west)
+        button_west.grid(row=4, column=5, padx=2, pady=2)
 
-        button_east = tk.Button(self.screen_game, text = "East", command = self.east)
-        button_east.grid(row = 4, column = 7, padx = 2, pady = 2)
-        
-        button_north = tk.Button(self.screen_game, text = "North", command = self.north)
-        button_north.grid(row = 3, column = 6, padx = 2, pady = 2)
+        button_east = tk.Button(self.screen_game, text="East", command=self.east)
+        button_east.grid(row=4, column=7, padx=2, pady=2)
 
-        button_south = tk.Button(self.screen_game, text = "South", command = self.south)
-        button_south.grid(row = 5, column = 6, padx = 2, pady = 2)
+        button_north = tk.Button(self.screen_game, text="North", command=self.north)
+        button_north.grid(row=3, column=6, padx=2, pady=2)
 
-        button_guess = tk.Button(self.screen_game, text = "Guess", command = self.guess) 
-        button_guess.grid(row = 4, column = 2, padx = 2, pady = 2)
+        button_south = tk.Button(self.screen_game, text="South", command=self.south)
+        button_south.grid(row=5, column=6, padx=2, pady=2)
 
-        button_attack = tk.Button(self.screen_game, text = "Attack", command = self.attack) 
-        button_attack.grid(row = 4, column = 0, padx = 2, pady = 2)
+        button_guess = tk.Button(self.screen_game, text="Guess", command=self.guess)
+        button_guess.grid(row=4, column=2, padx=2, pady=2)
 
-        button_pickup = tk.Button(self.screen_game, text = "Pickup", command = self.pickup) 
-        button_pickup.grid(row = 5, column = 1, padx = 2, pady = 2)
+        button_attack = tk.Button(self.screen_game, text="Attack", command=self.attack)
+        button_attack.grid(row=4, column=0, padx=2, pady=2)
 
-        button_inventory = tk.Button(self.screen_game, text = "Inventory", command = self.inventory) 
-        button_inventory.grid(row = 3, column = 1, padx = 2, pady = 2)
+        button_pickup = tk.Button(self.screen_game, text="Pickup", command=self.pickup)
+        button_pickup.grid(row=5, column=1, padx=2, pady=2)
 
-        button_stats = tk.Button(self.screen_game, text = "Stats", command = self.stats) 
-        button_stats.grid(row = 3, column = 3, padx = 2, pady = 2)
+        button_inventory = tk.Button(self.screen_game, text="Inventory", command=self.inventory)
+        button_inventory.grid(row=3, column=1, padx=2, pady=2)
 
-        button_menu = tk.Button(self.screen_game, text = "Menu", command = self.menu) 
-        button_menu.grid(row = 3, column = 4, padx = 2, pady = 2)
+        button_stats = tk.Button(self.screen_game, text="Stats", command=self.stats)
+        button_stats.grid(row=3, column=3, padx=2, pady=2)
+
+        button_menu = tk.Button(self.screen_game, text="Menu", command=self.menu)
+        button_menu.grid(row=3, column=4, padx=2, pady=2)
         self.enterRoom()
         self.screen_game.mainloop()
 
     def west(self):
         if self.currentRoom.is_dead_end(0):
-            messagebox.showerror("Error", message = 'There is no room west of this room.\n')
+            messagebox.showerror("Error", message='There is no room west of this room.\n')
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
-            messagebox.showerror("Error", message = "You cannot go west because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
+            messagebox.showerror("Error",
+                                 message="You cannot go west because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
         else:
             self.currentRoom = self.currentRoom.adjacentRooms[0]
             self.enterRoom()
 
     def north(self):
         if self.currentRoom.is_dead_end(1):
-            messagebox.showerror("Error", message = 'There is no room north of this room.\n')
+            messagebox.showerror("Error", message='There is no room north of this room.\n')
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
-            messagebox.showerror("Error", message = "You cannot go north because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
+            messagebox.showerror("Error",
+                                 message="You cannot go north because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
         else:
             self.currentRoom = self.currentRoom.adjacentRooms[1]
             self.enterRoom()
 
     def east(self):
         if self.currentRoom.is_dead_end(2):
-            messagebox.showerror("Error", message = 'There is no room east of this room.')
+            messagebox.showerror("Error", message='There is no room east of this room.')
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
-            messagebox.showerror("Error", message = "You cannot go east because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
+            messagebox.showerror("Error",
+                                 message="You cannot go east because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
         else:
             self.currentRoom = self.currentRoom.adjacentRooms[2]
             self.enterRoom()
 
     def south(self):
         if self.currentRoom.is_dead_end(3):
-            messagebox.showerror("Error", message = 'There is no room south of this room.\n')
+            messagebox.showerror("Error", message='There is no room south of this room.\n')
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
-            messagebox.showerror("Error", message = "You cannot go south because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
+            messagebox.showerror("Error",
+                                 message="You cannot go south because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
         else:
             self.currentRoom = self.currentRoom.adjacentRooms[3]
             self.enterRoom()
@@ -169,19 +174,19 @@ class Gui():
         self.guess_window.geometry("400x300")
         self.guess_window.title("Guess Menu")
 
-        label_guess = tk.Label(self.guess_window, text = "Guess: ")
-        label_guess.grid(row = 0, column = 0)
+        label_guess = tk.Label(self.guess_window, text="Guess: ")
+        label_guess.grid(row=0, column=0)
 
         self.entry_input = tk.Entry(self.guess_window)
-        self.entry_input.grid(row = 0, column = 1)
+        self.entry_input.grid(row=0, column=1)
         if self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE \
                 and not self.currentRoom.encounter.is_empty:
-            button_enter = tk.Button(self.guess_window, text = 'Enter Guess', command = self.puzzle_guess)
-            button_enter.grid(row = 1, columnspan = 2)
+            button_enter = tk.Button(self.guess_window, text='Enter Guess', command=self.puzzle_guess)
+            button_enter.grid(row=1, columnspan=2)
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP \
                 and not self.currentRoom.encounter.is_empty:
-            button_enter = tk.Button(self.guess_window, text = 'Enter Guess', command = self.trap_guess)
-            button_enter.grid(row = 1, columnspan = 2)
+            button_enter = tk.Button(self.guess_window, text='Enter Guess', command=self.trap_guess)
+            button_enter.grid(row=1, columnspan=2)
 
     def guess(self):
         if self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE \
@@ -191,82 +196,84 @@ class Gui():
                 and not self.currentRoom.encounter.is_empty:
             self.guess_menu()
         else:
-            messagebox.showerror("Error", message = "There is no unsolved puzzle in this room\n")
+            messagebox.showerror("Error", message="There is no unsolved puzzle in this room\n")
 
     def puzzle_guess(self):
         user_input = self.entry_input.get()
         self.guess_window.destroy()
         if user_input.lower().strip() in self.currentRoom.encounter.answers:
-            messagebox.showinfo('Success', message = 'Well done!\n')
+            messagebox.showinfo('Success', message='Well done!\n')
             self.currentRoom.encounter.is_empty = True
             # TODO: possibly add reward item
         else:
-            messagebox.showerror("Not Right", message = '\nHm, not quite.\n')
+            messagebox.showerror("Not Right", message='\nHm, not quite.\n')
         self.enterRoom()
 
     def trap_guess(self):
         user_input = self.entry_input.get()
         self.guess_window.destroy()
         if user_input.lower().strip() in self.currentRoom.encounter.solutions:
-            messagebox.showinfo('Success', message = '\nThe doors quickly swing open and you are free to leave!!!\n')
+            messagebox.showinfo('Success', message='\nThe doors quickly swing open and you are free to leave!!!\n')
             self.currentRoom.encounter.is_empty = True
         else:
-            messagebox.showerror("Not Right", message = '\nThe doors remain firmly in place, it seems that was not quite the answer.\n')
+            messagebox.showerror("Not Right",
+                                 message='\nThe doors remain firmly in place, it seems that was not quite the answer.\n')
         self.enterRoom()
 
     def enterRoom(self):
         if self.currentRoom.encounter.is_empty:
-            self.label.configure(text = 'You encounter an empty room')
+            self.label.configure(text='You encounter an empty room')
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.BOSS:
-            self.label.configure(text = f'You encounter a {self.currentRoom.encounter.boss.name}')
+            self.label.configure(text=f'You encounter a {self.currentRoom.encounter.boss.name}')
             try:
                 self.player.get_attacked(self.currentRoom.encounter.boss)
             except CharacterDeathException:
                 self.game_started = False
-                messagebox.showerror("Oh NO", message = '\nYou have died!!!')
+                messagebox.showerror("Oh NO", message='\nYou have died!!!')
                 self.screen_game.destroy()
                 self.start_menu_screen()
 
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE:
-            self.label.configure(text = f'You encounter a puzzle room: {self.currentRoom.encounter.puzzle_question}')
+            self.label.configure(text=f'You encounter a puzzle room: {self.currentRoom.encounter.puzzle_question}')
 
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP:
-            self.label.configure(text = f'The doors have quickly shut, trapping you in the room.\n'+
-                  f'You see a puzzle that seems to be connected to the doors\n'+
-                  f'The puzzle could probably open them, but the doors themselves\n'+
-                  f'Also look like they could be broken if you attacked them enough\n'+
-                  f'{self.currentRoom.encounter.trap_problem}')
+            self.label.configure(text=f'The doors have quickly shut, trapping you in the room.\n' +
+                                      f'You see a puzzle that seems to be connected to the doors\n' +
+                                      f'The puzzle could probably open them, but the doors themselves\n' +
+                                      f'Also look like they could be broken if you attacked them enough\n' +
+                                      f'{self.currentRoom.encounter.trap_problem}')
 
-        self.label2.configure(text = f'\nThere are rooms to the {self.currentRoom.directions()} of this room\n')
+        self.label2.configure(text=f'\nThere are rooms to the {self.currentRoom.directions()} of this room\n')
 
-    def attack(self): 
+    def attack(self):
         if self.currentRoom.encounter.encounter_type == EncounterTypes.BOSS \
                 and not self.currentRoom.encounter.is_empty:
             try:
                 self.currentRoom.encounter.boss.get_attacked(self.player)
             except CharacterDeathException:
-                messagebox.showinfo('Success', message = f'The {self.currentRoom.encounter.boss.name} has been slain !!!')
+                messagebox.showinfo('Success', message=f'The {self.currentRoom.encounter.boss.name} has been slain !!!')
                 self.currentRoom.encounter.is_empty = True
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP \
                 and not self.currentRoom.encounter.is_empty:
             try:
                 self.currentRoom.encounter.door.get_attacked(self.player)
             except CharacterDeathException:
-                messagebox.showinfo('Success', message = f'The door splinters open and you are free to leave the room !!!')
+                messagebox.showinfo('Success',
+                                    message=f'The door splinters open and you are free to leave the room !!!')
                 self.currentRoom.encounter.is_empty = True
         else:
-            messagebox.showerror("Error", message = "There is no monster to attack\n")
+            messagebox.showerror("Error", message="There is no monster to attack\n")
         self.enterRoom()
 
     def pickup(self):
         # TODO add functionality
-        messagebox.showerror("Error", message = 'Not implemented yet')
+        messagebox.showerror("Error", message='Not implemented yet')
 
     def inventory(self):
         self.inventory_window = tk.Toplevel()
         self.inventory_window.geometry("400x300")
         self.inventory_window.title("Inventory Menu")
-        label_inventory = tk.Label(self.inventory_window, text = self.player.inventory)
+        label_inventory = tk.Label(self.inventory_window, text=self.player.inventory)
         label_inventory.pack()
         # TODO add drop, equip and use buttons
 
@@ -274,25 +281,25 @@ class Gui():
         self.stats_window = tk.Toplevel()
         self.stats_window.geometry("400x300")
         self.stats_window.title("Stats Menu")
-        label_stats = tk.Label(self.stats_window, text = self.player.get_character_info())
-        label_stats.grid(row = 0, column = 0)
+        label_stats = tk.Label(self.stats_window, text=self.player.get_character_info())
+        label_stats.grid(row=0, column=0)
 
     def menu(self):
         self.menu_window = tk.Toplevel()
         self.menu_window.geometry("400x300")
         self.menu_window.title("Menu")
 
-        button_save = tk.Button(self.menu_window, text = 'Save', command = self.save)
-        button_save.grid(row = 0)
+        button_save = tk.Button(self.menu_window, text='Save', command=self.save)
+        button_save.grid(row=0)
 
-        button_load = tk.Button(self.menu_window, text = 'Load', command = self.load)
-        button_load.grid(row = 1)
+        button_load = tk.Button(self.menu_window, text='Load', command=self.load)
+        button_load.grid(row=1)
 
-        button_quit = tk.Button(self.menu_window, text = 'Quit', command = self.quit)
-        button_quit.grid(row = 2)
-        
-        button_return = tk.Button(self.menu_window, text = 'Return to Game', command = self.menu_window.destroy)
-        button_return.grid(row = 3)
+        button_quit = tk.Button(self.menu_window, text='Quit', command=self.quit)
+        button_quit.grid(row=2)
+
+        button_return = tk.Button(self.menu_window, text='Return to Game', command=self.menu_window.destroy)
+        button_return.grid(row=3)
 
     def save(self):
         # Creates a dictionary to pickle all needed game objects. Any other needed objects are easily addable.
@@ -303,7 +310,7 @@ class Gui():
 
         # Dumps the saveObject to the working directory of the script.
         pickle.dump(saveObject, open("savefile", "wb"))
-        messagebox.showinfo('Success', message = 'Save Successful')
+        messagebox.showinfo('Success', message='Save Successful')
 
     def generateRooms(self):
         self.currentRoom = Room("Entrance")
@@ -346,6 +353,7 @@ class Gui():
 
                 createdRooms += 1
 
+
 def main():
     # test gui
     g = Gui()
@@ -353,5 +361,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

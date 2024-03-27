@@ -1,4 +1,5 @@
-from encounter import Encounter
+import character
+from encounter import *
 from item import Item
 
 
@@ -17,6 +18,13 @@ class Room:
         self.items = items
         self.encounter = Encounter()
         self.position = position
+        self.monsters = []
+        self.generate_monsters()
+
+    def generate_monsters(self):
+        if self.encounter not in (EncounterTypes.BOSS, EncounterTypes.TRAP, EncounterTypes.STORE):
+            for i in range(random.randint(0, 3)):
+                self.monsters.append(character.get_monster())
 
     def assignRoom(self, room, direction):
         """
@@ -46,10 +54,6 @@ class Room:
         room.position = [self.position[0] + pointerX, self.position[1] + pointerY]
 
         room.adjacentRooms[(direction + 2) % 4] = self
-
-    # def assignRoom(self, room, direction):
-    #     self.adjacentRooms[direction] = room
-    #     room.adjacentRooms[(direction + 2) % 4] = self
 
     # 0 is West, 1 is North, 2 is East, 3 is South
     def is_dead_end(self, direction:int):

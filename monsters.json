@@ -1,0 +1,7 @@
+{
+  "monster": [
+    {"name": "Slime", "health":  [4, 12], "attack": [0, 3], "defense": 0},
+    {"name": "Goblin", "health":  [8, 24], "attack": [2, 6], "defense": [1, 5]}
+  ],
+  "boss": []
+}

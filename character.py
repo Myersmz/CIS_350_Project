@@ -1,5 +1,10 @@
 from item import *
 
+# On load
+file = open("monsters.json", "r")
+monsters = json.load(file)
+file.close()
+
 
 class Character:
     """
@@ -7,6 +12,7 @@ class Character:
     Also contains methods such as add_to_inventory and print character info that allows for interaction
     With character aspects such as the inventory and stats
     """
+
     def __init__(self, name, health, attack, defense):
         self.name = name
         self.is_player = False
@@ -31,9 +37,11 @@ class Character:
         }
 
         self.inventory = []
-        self.equipped_weapon = Item("Hands", "", item_type=ItemTypes.MELEE, attribute_value=3)
-        self.equipped_shield: Item = Item("Nothing", "", ItemTypes.ITEM, attribute_value=0)
-        self.equipped_armour: Item = Item("Nothing", "", ItemTypes.ITEM, attribute_value=0)
+        self.gold = 0
+
+        self.equipped_weapon: Item = Item("Hands", "", item_type=ItemTypes.MELEE, attribute_value=3)
+        self.equipped_shield: Item = Item("None", "", ItemTypes.ITEM, attribute_value=0)
+        self.equipped_armour: Item = Item("None", "", ItemTypes.ITEM, attribute_value=0)
 
     def assign_player(self):
         """
@@ -48,12 +56,18 @@ class Character:
 
     # Adds an item to inventory
     def add_to_inventory(self, item):
+        if item.name == "Gold":
+            self.add_gold(item.get_attribute())
+            return
         self.inventory.append(item)
 
     # Takes an item from inventory
     def remove_from_inventory(self, item):
         if item in self.inventory:
             self.inventory.remove(item)
+
+    def equip_from_inventory(self):
+        pass
 
     # Prints character information
     def print_character_info(self):
@@ -65,7 +79,6 @@ class Character:
 
     def get_character_info(self):
         return f"Character Name: {self.name}\nCharacter Health: {self.health}\nCharacter Attack: {self.base_attack}\nCharacter Defense: {self.base_defense}\nCharacter Inventory: {self.inventory}"
-    
 
     # Causes damage from one character to another, based on their attack and defense stats.
     def get_attacked(self, attacker):
@@ -74,7 +87,13 @@ class Character:
         self.health -= max(0, (damage - defense))
 
         if self.health <= 0:
+            if self.is_player:
+                self.transfer_inventory(attacker)
             raise CharacterDeathException(f"Died to {attacker.name}", self)
+
+    def transfer_inventory(self, target):
+        while len(self.inventory) > 0:
+            target.add_to_inventory(self.inventory.pop(0))
 
     def get_defense(self) -> int:
         """
@@ -129,12 +148,28 @@ class Character:
             mult *= stat.multiplier
         return mult
 
+    def get_gold(self) -> int:
+        return self.gold
+
+    def add_gold(self, amount: int):
+        if amount <= 0:
+            raise ValueError("Value \'amount\' must be a positive integer.")
+        self.gold += amount
+
+    def remove_gold(self, amount: int):
+        if amount <= 0:
+            raise ValueError("Value \'amount\' must be a positive integer.")
+        if self.gold < amount:
+            raise ValueError("Value \'amount\' cannot be greater than the value of get_gold()")
+
+        self.gold -= amount
+
 
 class CharacterDeathException(BaseException):
-
     """
     Description: Exception for when a character dies handled in game.py raised in character.py
     """
+
     def __init__(self, st, character) -> None:
         super().__init__(st)
         self.character = character
@@ -147,9 +182,37 @@ class Stat:
         self.duration = duration
 
 
+def get_monster() -> Character:
+    monster_list = monsters.get("monster")
+
+    monster = monster_list[random.randint(0, len(monsters) - 1)]
+
+    if type(health := monster.get("health")) == list:
+        monster_health = random.randint(health[0], health[1])
+    else:
+        monster_health = health
+
+    if type(attack := monster.get("attack")) == list:
+        monster_attack = random.randint(attack[0], attack[1])
+    else:
+        monster_attack = attack
+
+    if type(defense := monster.get("defense")) == list:
+        monster_defense = random.randint(defense[0], defense[1])
+    else:
+        monster_defense = defense
+
+    new_monster = Character(monster.get("name"), health=monster_health, attack=monster_attack, defense=monster_defense)
+
+    gold_value = random.randint(0, 20)
+    if gold_value != 0:
+        new_monster.add_to_inventory(Item("Gold", attribute_value=gold_value))
+    return new_monster
+
+
 if __name__ == "__main__":
     # Test code
-    test = Character("Lolz", 10, 10, 10)
+    test = Character("test", 10, 10, 10)
     test.equipped_shield = Item("Iron Shield", "debug", attribute_value=[-4, 10], item_type=ItemTypes.SHIELD)
     # # test.equipped_shield = Item("Iron Shield", "debug", attribute_value=6, item_type=ItemTypes.SHIELD)
     # test.multipliers["defense"].append(Stat(multiplier=2))
@@ -163,4 +226,3 @@ if __name__ == "__main__":
     test.get_attacked(mon)
     test.print_character_info()
     # print(test.calc_defense())
-
