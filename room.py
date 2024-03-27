@@ -8,17 +8,26 @@ class Room:
     This is the class for representing and storing information about the room. The rooms work similar to a linked list with adjacent rooms holding what rooms
     there are for being adjacent. Uses the encounter class to make the type of room. Uses the item class for any items dropped in the room.
     """
-    def __init__(self, name, left=None, up=None, right=None, down=None, items=None, position=None):
+    def __init__(self, name, left=None, up=None, right=None, down=None, items=None, position=None, encounter_type=None):
         if position is None:
             position = [0, 0]
+        self.position = position
+
         if items is None:
             items = []
+        self.items = items
+
+        if encounter_type is None:
+            encounter_type = random.randint(1, max_generation_rooms)
+        self.encounter_type = encounter_type
+
         self.name = name
         self.adjacentRooms = [left, up, right, down]
-        self.items = items
-        self.encounter = Encounter()
-        self.position = position
+        self.encounter = None
         self.monsters = []
+
+    def initiate(self):
+        self.encounter = Encounter(self.encounter_type)
         self.generate_monsters()
 
     def generate_monsters(self):

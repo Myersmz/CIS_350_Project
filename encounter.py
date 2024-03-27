@@ -1,14 +1,20 @@
 import random
+import character
 from character import Character
 from enum import Enum
 
+# The largest value of the "safe to generate" EncounterTypes
+max_generation_rooms = 3
+# The largest value of the EncounterTypes that must have a single room
+max_single_rooms = 101
+
 
 class EncounterTypes(Enum):
-    PUZZLE = 1
-    BOSS = 2
+    EMPTY = 1
+    PUZZLE = 2
     TRAP = 3
-    STORE = 4
-    EMPTY = 10
+    BOSS = 100
+    STORE = 101
 
 
 class Encounter:
@@ -18,12 +24,6 @@ class Encounter:
     """
     def __init__(self, encounter_type=None):
         self.is_empty = True
-
-        # movement options
-        self.Options = ['yes', 'no', 'forward', 'back', 'left', 'right']
-
-        # possible monsters
-        self.Monsters = ["Demon", "Dragon", "Minotaur", "Imp", "Goblin", "Ogre", "Dwarf"]
 
         # questions = keys
         # answers = values
@@ -59,16 +59,8 @@ class Encounter:
     def boss_fight(self):
         self.is_empty = False
 
-        # choose random boss from the list
-        boss_name = random.choice(self.Monsters)
-
-        # scale boss stats according to current player stats
-        monster_health = random.randint(15, 25)
-        monster_attack = random.randint(3, 6)
-        monster_defense = random.randint(0, 4)
-
         # create boss object
-        self.boss = Character(boss_name, monster_health, monster_attack, monster_defense)
+        self.boss = character.get_boss()
 
     # chooses random question
     def puzzle_room(self):
@@ -83,15 +75,13 @@ class Encounter:
         # creates door object to be broken open
         self.door = Character('Door', 15, 0, 0)
 
-
     # TODO: possibly add random loot chance or trap?
     def empty_room(self):
         self.is_empty = True
 
-    # encounterType rolls 1-4 inculsive
     def generate_encounter(self, encounter_type=None):
         if encounter_type is None:
-            self.encounter_type = EncounterTypes(random.randint(1, 4))
+            self.encounter_type = EncounterTypes(random.randint(1, max_generation_rooms))
         else:
             self.encounter_type = EncounterTypes(encounter_type)
 

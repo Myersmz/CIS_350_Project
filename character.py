@@ -5,6 +5,12 @@ file = open("monsters.json", "r")
 monsters = json.load(file)
 file.close()
 
+floor_multipliers = {
+    "health": [],
+    "attack": [],
+    "defense": []
+}
+
 
 class Character:
     """
@@ -25,12 +31,6 @@ class Character:
         self.next_attack = None
 
         self.multipliers = {
-            "health": [],
-            "attack": [],
-            "defense": []
-        }
-
-        self.floor_multipliers = {
             "health": [],
             "attack": [],
             "defense": []
@@ -141,7 +141,7 @@ class Character:
 
         mult = 1.0
         if not self.is_player:
-            for stat in self.floor_multipliers.get(stat_type):
+            for stat in floor_multipliers.get(stat_type):
                 mult *= stat.multiplier
 
         for stat in self.multipliers.get(stat_type):
@@ -206,23 +206,52 @@ def get_monster() -> Character:
 
     gold_value = random.randint(0, 20)
     if gold_value != 0:
-        new_monster.add_to_inventory(Item("Gold", attribute_value=gold_value))
+        new_monster.add_to_inventory(Item("Gold", description="Used to buy items at the shop",
+                                          attribute_value=gold_value))
     return new_monster
 
 
-if __name__ == "__main__":
-    # Test code
-    test = Character("test", 10, 10, 10)
-    test.equipped_shield = Item("Iron Shield", "debug", attribute_value=[-4, 10], item_type=ItemTypes.SHIELD)
-    # # test.equipped_shield = Item("Iron Shield", "debug", attribute_value=6, item_type=ItemTypes.SHIELD)
-    # test.multipliers["defense"].append(Stat(multiplier=2))
-    # test.multipliers["defense"].append(Stat("Slow", multiplier=0.7))
+def get_boss():
+    monster_list = monsters.get("boss")
 
-    mon = Character("Cursed Seal", 14, 6, 7)
-    mon.equipped_weapon = Item("Flipper", "", attribute_value=[2, 8], item_type=ItemTypes.MELEE)
-    mon.multipliers["attack"].append(Stat("Enraged", multiplier=5))
+    boss = monster_list[random.randint(0, len(monsters) - 1)]
 
-    test.print_character_info()
-    test.get_attacked(mon)
-    test.print_character_info()
-    # print(test.calc_defense())
+    if type(health := boss.get("health")) == list:
+        boss_health = random.randint(health[0], health[1])
+    else:
+        boss_health = health
+
+    if type(attack := boss.get("attack")) == list:
+        boss_attack = random.randint(attack[0], attack[1])
+    else:
+        boss_attack = attack
+
+    if type(defense := boss.get("defense")) == list:
+        boss_defense = random.randint(defense[0], defense[1])
+    else:
+        boss_defense = defense
+
+    new_boss = Character(boss.get("name"), health=boss_health, attack=boss_attack, defense=boss_defense)
+
+    gold_value = random.randint(40, 200)
+    if gold_value != 0:
+        new_boss.add_to_inventory(Item("Gold", description="Used to buy items at the shop",
+                                       attribute_value=gold_value))
+    return new_boss
+
+# if __name__ == "__main__":
+#     # Test code
+#     test = Character("test", 10, 10, 10)
+#     test.equipped_shield = Item("Iron Shield", "debug", attribute_value=[-4, 10], item_type=ItemTypes.SHIELD)
+#     # # test.equipped_shield = Item("Iron Shield", "debug", attribute_value=6, item_type=ItemTypes.SHIELD)
+#     # test.multipliers["defense"].append(Stat(multiplier=2))
+#     # test.multipliers["defense"].append(Stat("Slow", multiplier=0.7))
+#
+#     mon = Character("Cursed Seal", 14, 6, 7)
+#     mon.equipped_weapon = Item("Flipper", "", attribute_value=[2, 8], item_type=ItemTypes.MELEE)
+#     mon.multipliers["attack"].append(Stat("Enraged", multiplier=5))
+#
+#     test.print_character_info()
+#     test.get_attacked(mon)
+#     test.print_character_info()
+#     # print(test.calc_defense())

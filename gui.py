@@ -327,7 +327,9 @@ class Gui():
             direction = random.randint(0, 3)
 
             if selectedRoom.adjacentRooms[direction] is None:
+                createdRooms += 1
                 newRoom = Room("Room " + str(createdRooms))
+
                 selectedRoom.assignRoom(newRoom, direction)
                 rooms.append(newRoom)
 
@@ -351,7 +353,15 @@ class Gui():
                 if rm is not None and rm != selectedRoom:
                     rm.assignRoom(newRoom, 1)
 
-                createdRooms += 1
+        # Assign needed EncounterTypes.
+        other_rooms = [rooms.pop(0)]
+        for i in range(100, max_single_rooms+1):
+            position = random.randint(0, len(rooms) - 1)
+            rooms[position].encounter_type = EncounterTypes(i)
+            other_rooms.append(rooms.pop(position))
+
+        for room in rooms+other_rooms:
+            room.initiate()
 
 
 def main():
