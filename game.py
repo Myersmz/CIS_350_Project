@@ -148,18 +148,25 @@ class Game:
                   f'The puzzle could probably open them, but the doors themselves\n'
                   f'Also look like they could be broken if you attacked them enough')
             print(f'{self.currentRoom.encounter.trap_problem}')
-
+            
+        """
         elif self.currentRoom.encounter.encounter_type == EncounterTypes.SHOP:
             print(f'You have encountered a mysterious shop\n')
-            self.currentRoom.encounter.shop_encounter.display_shop_inventory()
-            print('\nBuy - Buy items\n')
 
-            choice = input('Enter your choice: ').lower
-            os.system('cls')
-
-            # TODO: implement buy method
-            if choice == 'buy':
-                print('TODO: implement shop menu/buy method')
+            while True:  # Loop for shop interaction
+                choice = input('\nBuy [item name], List, or Exit: ').lower().split()
+                if choice[0] == 'exit':
+                    break
+                elif choice[0] == 'list':
+                    self.currentRoom.encounter.shop_encounter.display_shop_inventory()
+                elif choice[0] == 'buy' and len(choice) > 1:
+                    item_name = ' '.join(choice[1:])  # Handle multi-word item names
+                    success = self.currentRoom.encounter.shop_encounter.buy_item(self.player, item_name)
+                    if success:
+                        self.player.print_character_info()  # Update player stats after purchase
+                else:
+                    print("Invalid choice.")
+        """
 
         print(f'There are rooms to the {self.currentRoom.directions()} of this room\n')
 

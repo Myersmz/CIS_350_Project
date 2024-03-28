@@ -98,6 +98,7 @@ class Encounter:
         elif self.encounter_type == EncounterTypes.TRAP:
             print('trap')
             self.trap_room()
+        """
         elif self.encounter_type == EncounterTypes.SHOP:
             self.is_empty = False
             self.shop_encounter = ShopEncounter()
@@ -105,7 +106,8 @@ class Encounter:
         else:
             print('else empty room')
             self.empty_room()
-    
+        """
+        
 class ShopEncounter(Encounter):
     def __init__(self):
         super().__init__()  # Call the parent class's constructor
@@ -119,6 +121,7 @@ class ShopEncounter(Encounter):
         for item in self.shop_inventory:
             print(f"{item.name} ({item.price} coins): {item.description}")
 
+    """
     def buy_item(self, player, item_name):
         for item in self.shop_inventory:
             if item.name == item_name:
@@ -132,3 +135,4 @@ class ShopEncounter(Encounter):
                     return False
         print("Item not found in the shop.")
         return False
+    """
