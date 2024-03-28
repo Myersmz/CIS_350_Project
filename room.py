@@ -1,6 +1,6 @@
 import character
 from encounter import *
-from item import *
+from item import Item
 
 
 class Room:
@@ -8,14 +8,14 @@ class Room:
     This is the class for representing and storing information about the room. The rooms work similar to a linked list with adjacent rooms holding what rooms
     there are for being adjacent. Uses the encounter class to make the type of room. Uses the item class for any items dropped in the room.
     """
-    def __init__(self, name, left=None, up=None, right=None, down=None, item_list=None, position=None, encounter_type=None):
+    def __init__(self, name, left=None, up=None, right=None, down=None, items=None, position=None, encounter_type=None):
         if position is None:
             position = [0, 0]
         self.position = position
 
-        if item_list is None:
-            item_list = []
-        self.items = item_list
+        if items is None:
+            items = []
+        self.items = items
 
         if encounter_type is None:
             encounter_type = random.randint(1, max_generation_rooms)
@@ -29,26 +29,11 @@ class Room:
     def initiate(self):
         self.encounter = Encounter(self.encounter_type)
         self.generate_monsters()
-        self.generate_items()
 
     def generate_monsters(self):
-        if self.encounter_type in (EncounterTypes.BOSS, EncounterTypes.TRAP, EncounterTypes.STORE):
-            return
-
-        for i in range(random.randint(0, 3)):
-            self.monsters.append(character.get_monster())
-
-    def generate_items(self):
-        if self.encounter_type in (EncounterTypes.BOSS, EncounterTypes.STORE):
-            return
-
-        count = random.randint(-1, 2)
-
-        for i in range(count):
-            new_item = Item()
-            new_item_type = ItemTypes(random.randint(0, max_item_types))
-            new_item.generateItem(new_item_type)
-            self.items.append(new_item)
+        if self.encounter not in (EncounterTypes.BOSS, EncounterTypes.TRAP, EncounterTypes.STORE):
+            for i in range(random.randint(0, 3)):
+                self.monsters.append(character.get_monster())
 
     def assignRoom(self, room, direction):
         """
