@@ -2,6 +2,8 @@ import random
 import character
 from character import Character
 from enum import Enum
+from shop import ShopEncounter
+from item import *
 
 # The largest value of the "safe to generate" EncounterTypes
 max_generation_rooms = 3
@@ -14,7 +16,7 @@ class EncounterTypes(Enum):
     PUZZLE = 2
     TRAP = 3
     BOSS = 100
-    STORE = 101
+    SHOP = 101
 
 
 class Encounter:
@@ -35,8 +37,8 @@ class Encounter:
 
         # problems = keys
         # solutions = values
-        self.Problems = {"What is 2+96+7?": "105",
-                         "What is 5+19+3?": "27",
+        self.Problems = {"What is 2 + 96 + 7?": "105",
+                         "What is 5 + 19 + 3?": "27",
                          "What is 3 + 9 + 45?": "57",
                          "What is 8 + 2 + 18?": "28",
                          "What is 5 + 6 + 23?": "34"}
@@ -80,16 +82,53 @@ class Encounter:
         self.is_empty = True
 
     def generate_encounter(self, encounter_type=None):
+        print('generating encounter...')
         if encounter_type is None:
             self.encounter_type = EncounterTypes(random.randint(1, max_generation_rooms))
         else:
+            print('else')
             self.encounter_type = EncounterTypes(encounter_type)
 
         if self.encounter_type == EncounterTypes.BOSS:
+            print('boss')
             self.boss_fight()
         elif self.encounter_type == EncounterTypes.PUZZLE:
+            print('puzzle')
             self.puzzle_room()
         elif self.encounter_type == EncounterTypes.TRAP:
+            print('trap')
             self.trap_room()
+        elif self.encounter_type == EncounterTypes.SHOP:
+            self.is_empty = False
+            self.shop_encounter = ShopEncounter()
+            print('You have encountered a shop!')
         else:
+            print('else empty room')
             self.empty_room()
+    
+class ShopEncounter(Encounter):
+    def __init__(self):
+        super().__init__()  # Call the parent class's constructor
+
+        # Load shop inventory from items.json
+        with open("items.json", "r") as file:
+            items = json.load(file)
+            self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION']) for item in items.get("CONSUMABLES", [])]
+
+    def display_shop_inventory(self):
+        for item in self.shop_inventory:
+            print(f"{item.name} ({item.price} coins): {item.description}")
+
+    def buy_item(self, player, item_name):
+        for item in self.shop_inventory:
+            if item.name == item_name:
+                if player.currency >= item.price:
+                    player.currency -= item.price
+                    player.inventory.append(item)
+                    print(f"You purchased {item.name}!")
+                    return True
+                else:
+                    print("You don't have enough coins.")
+                    return False
+        print("Item not found in the shop.")
+        return False

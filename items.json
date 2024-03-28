@@ -22,7 +22,7 @@
     {"NAME": "Reinforced Wooden Shield", "DESCRIPTION": "It's assembled with metalic parts, it seems strong.", "ATTRIBUTE": 5, "RARITY": 12},
     {"NAME": "Iron Shield", "DESCRIPTION": "A fully iron shield.", "ATTRIBUTE": 8, "RARITY": 4}
   ],
-  "POTION": [
+  "Potions": [
     {"NAME": "Healing Potion", "DESCRIPTION": "Heals some health", "ATTRIBUTE": [4,12], "RARITY": 4}
   ],
   "ITEM": [
@@ -40,6 +40,10 @@
   ],
   "KEY": [
     {"NAME": "Broken Key", "DESCRIPTION": "Too damaged to be useful.", "ATTRIBUTE": 0, "RARITY":  1}
+  ],
+  "CONSUMABLES": [
+    {"NAME": "Pineapple Pizza", "DESCRIPTION": "Heals some health", "ATTRIBUTE": [4,12], "PRICE": 10},
+    {"NAME": "Defense Potion", "DESCRIPTION": "Boosts defense", "ATTRIBUTE": [5, 10], "PRICE": 10},
+    {"NAME": "Attack Potion", "DESCRIPTION": "Boosts attack", "ATTRIBUTE": [5, 10], "PRICE": 10}
   ]
 }
-

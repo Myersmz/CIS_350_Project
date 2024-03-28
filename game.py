@@ -7,7 +7,7 @@ from item import *
 import pickle
 import random
 import time
-
+from shop import *
 
 class Game:
 
@@ -149,6 +149,18 @@ class Game:
                   f'Also look like they could be broken if you attacked them enough')
             print(f'{self.currentRoom.encounter.trap_problem}')
 
+        elif self.currentRoom.encounter.encounter_type == EncounterTypes.SHOP:
+            print(f'You have encountered a mysterious shop\n')
+            self.currentRoom.encounter.shop_encounter.display_shop_inventory()
+            print('\nBuy - Buy items\n')
+
+            choice = input('Enter your choice: ').lower
+            os.system('cls')
+
+            # TODO: implement buy method
+            if choice == 'buy':
+                print('TODO: implement shop menu/buy method')
+
         print(f'There are rooms to the {self.currentRoom.directions()} of this room\n')
 
     def printChoices(self):
@@ -252,9 +264,7 @@ class Game:
                 rm = roomMap.get(newRoom_position[0], {}).get(newRoom_position[1] + 1, None)
                 if rm is not None and rm != selectedRoom:
                     rm.assignRoom(newRoom, 1)
-
                 createdRooms += 1
-
 
 def main():
     # do the game

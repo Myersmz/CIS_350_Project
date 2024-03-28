@@ -34,6 +34,7 @@ class Item:
         self.name = name
         self.description = description
         self.type = item_type
+        self.price = None
 
         # 'attributeValue' contains the attribute of the item, based on the item type.
         # For a sword this value would be the attack buff, and a shield / armour it would be the defense buff.
