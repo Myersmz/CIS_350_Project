@@ -31,7 +31,7 @@ class Room:
         self.generate_monsters()
 
     def generate_monsters(self):
-        if self.encounter not in (EncounterTypes.BOSS, EncounterTypes.TRAP, EncounterTypes.STORE):
+        if self.encounter not in (EncounterTypes.BOSS, EncounterTypes.TRAP, EncounterTypes.SHOP):
             for i in range(random.randint(0, 3)):
                 self.monsters.append(character.get_monster())
 

@@ -77,62 +77,37 @@ class Encounter:
         # creates door object to be broken open
         self.door = Character('Door', 15, 0, 0)
 
-    # TODO: possibly add random loot chance or trap?
     def empty_room(self):
         self.is_empty = True
 
     def generate_encounter(self, encounter_type=None):
-        print('generating encounter...')
         if encounter_type is None:
             self.encounter_type = EncounterTypes(random.randint(1, max_generation_rooms))
         else:
-            print('else')
             self.encounter_type = EncounterTypes(encounter_type)
 
         if self.encounter_type == EncounterTypes.BOSS:
-            print('boss')
             self.boss_fight()
         elif self.encounter_type == EncounterTypes.PUZZLE:
-            print('puzzle')
             self.puzzle_room()
         elif self.encounter_type == EncounterTypes.TRAP:
-            print('trap')
             self.trap_room()
-        """
         elif self.encounter_type == EncounterTypes.SHOP:
             self.is_empty = False
             self.shop_encounter = ShopEncounter()
-            print('You have encountered a shop!')
         else:
-            print('else empty room')
             self.empty_room()
-        """
+
+class ShopEncounter:
         
-class ShopEncounter(Encounter):
-    def __init__(self):
-        super().__init__()  # Call the parent class's constructor
-
-        # Load shop inventory from items.json
-        with open("items.json", "r") as file:
-            items = json.load(file)
-            self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION']) for item in items.get("CONSUMABLES", [])]
-
-    def display_shop_inventory(self):
-        for item in self.shop_inventory:
-            print(f"{item.name} ({item.price} coins): {item.description}")
-
-    """
-    def buy_item(self, player, item_name):
-        for item in self.shop_inventory:
-            if item.name == item_name:
-                if player.currency >= item.price:
-                    player.currency -= item.price
-                    player.inventory.append(item)
-                    print(f"You purchased {item.name}!")
-                    return True
-                else:
-                    print("You don't have enough coins.")
-                    return False
-        print("Item not found in the shop.")
-        return False
-    """
+        def __init__(self):
+            # Load shop inventory from items.json
+            with open("items.json", "r") as file:
+                items = json.load(file)
+                self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION']) for item in items.get("CONSUMABLES", [])]
+        
+        # Return string representation of shop items
+        def display_shop_inventory(self):
+            """Returns a string representation of shop items for the label."""
+            item_strings = [f"{item.name} ({item.price} coins): {item.description}" for item in self.shop_inventory]
+            return "\n".join(item_strings)

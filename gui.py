@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from character import *
 from encounter import *
+from encounter import ShopEncounter
 from room import *
 from item import *
 import pickle
@@ -220,6 +221,37 @@ class Gui():
                                  message='\nThe doors remain firmly in place, it seems that was not quite the answer.\n')
         self.enterRoom()
 
+    def shop_window(self):
+        # Create a new window for the shop
+        shop_window = tk.Toplevel(self.screen_game)
+        shop_window.title("Shop")
+
+        # Display shop message
+        shop_label = tk.Label(shop_window, text="Welcome to the shop.")
+        shop_label.pack()
+
+        shop_inventory_text = tk.Label(shop_window, text=self.currentRoom.encounter.shop_encounter.display_shop_inventory())
+        shop_inventory_text.pack()
+
+        # Create entry box for user input
+        user_input_label = tk.Label(shop_window, text="What would you like to buy? (item, quantity)")
+        user_input_label.pack()
+
+        user_input_entry = tk.Entry(shop_window)
+        user_input_entry.pack()
+
+        # TODO: Implement 'gold' and define function to handle buying items
+        def buy_item():
+            pass
+
+        # Create button to buy items
+        buy_button = tk.Button(shop_window, text="Buy", command=buy_item)
+        buy_button.pack()
+
+        # Create button to exit the shop
+        exit_button = tk.Button(shop_window, text="Exit", command=shop_window.destroy)
+        exit_button.pack()
+
     def enterRoom(self):
         if self.currentRoom.encounter.is_empty:
             self.label.configure(text='You encounter an empty room')
@@ -242,6 +274,10 @@ class Gui():
                                       f'The puzzle could probably open them, but the doors themselves\n' +
                                       f'Also look like they could be broken if you attacked them enough\n' +
                                       f'{self.currentRoom.encounter.trap_problem}')
+            
+        elif self.currentRoom.encounter.encounter_type == EncounterTypes.SHOP:
+            self.label.configure(text="You have encountered a mysterious shop.")
+            self.shop_window()
 
         self.label2.configure(text=f'\nThere are rooms to the {self.currentRoom.directions()} of this room\n')
 
