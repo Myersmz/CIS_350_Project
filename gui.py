@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import messagebox
 from character import *
 from encounter import *
-from encounter import ShopEncounter
 from room import *
 from item import *
 import pickle
