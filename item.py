@@ -3,6 +3,11 @@ import random
 from enum import Enum
 
 
+file = open("items.json", "r")
+items = json.load(file)
+file.close()
+
+
 # Easily represents an item type.
 class ItemTypes(Enum):
     MELEE = 0
@@ -13,7 +18,10 @@ class ItemTypes(Enum):
     ITEM = 5
     SHIELD = 6
     ARMOUR = 7
-    KEY = 10
+    KEY = 8
+
+# Must be set for other code to work
+max_item_types = 8
 
 
 class Item:
@@ -44,10 +52,6 @@ class Item:
         # {"NAME": "", "DESCRIPTION": "", "ATTRIBUTE": int, "RARITY": int}
         typeString = str(item_type)[10:]
         this_item = None
-
-        file = open("items.json", "r")
-
-        items = json.load(file)
         item_list = items.get(typeString, None)
 
         # Sums the total weight of items from the list of a single type.
