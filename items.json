@@ -41,9 +41,9 @@
   "KEY": [
     {"NAME": "Broken Key", "DESCRIPTION": "Too damaged to be useful.", "ATTRIBUTE": 0, "RARITY":  1}
   ],
-  "CONSUMABLES": [
-    {"NAME": "Pineapple Pizza", "DESCRIPTION": "Heals some health", "ATTRIBUTE": [4,12], "PRICE": 10},
-    {"NAME": "Defense Potion", "DESCRIPTION": "Boosts defense", "ATTRIBUTE": [5, 10], "PRICE": 10},
-    {"NAME": "Attack Potion", "DESCRIPTION": "Boosts attack", "ATTRIBUTE": [5, 10], "PRICE": 10}
+  "SHOP": [
+    {"NAME": "Pineapple Pizza", "DESCRIPTION": "Heals some health", "ATTRIBUTE": 10, "RARITY": 0},
+    {"NAME": "Defense Potion", "DESCRIPTION": "Boosts defense", "ATTRIBUTE": 10, "RARITY": 0},
+    {"NAME": "Attack Potion", "DESCRIPTION": "Boosts attack", "ATTRIBUTE": 10, "RARITY": 0}
   ]
 }

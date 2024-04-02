@@ -229,22 +229,52 @@ class Gui():
         shop_label = tk.Label(shop_window, text="Welcome to the shop.")
         shop_label.pack()
 
+        # Display shop inventory
         shop_inventory_text = tk.Label(shop_window, text=self.currentRoom.encounter.shop_encounter.display_shop_inventory())
         shop_inventory_text.pack()
 
-        # Create entry box for user input
-        user_input_label = tk.Label(shop_window, text="What would you like to buy? (item, quantity)")
-        user_input_label.pack()
+        # Dropdown for item selection
+        item_options = self.currentRoom.encounter.shop_encounter.display_items()
+        selected_item = tk.StringVar(shop_window)
+        selected_item.set(item_options[0])
 
-        user_input_entry = tk.Entry(shop_window)
-        user_input_entry.pack()
+        item_dropdown = tk.OptionMenu(shop_window, selected_item, *item_options)
+        item_dropdown.pack()
 
-        # TODO: Implement 'gold' and define function to handle buying items
-        def buy_item():
-            pass
+        # Dropdown for quantity selection
+        quantity_options = [str(i) for i in range(1, 11)]
+        selected_quantity = tk.StringVar(shop_window)
+        selected_quantity.set(quantity_options[0])
 
-        # Create button to buy items
-        buy_button = tk.Button(shop_window, text="Buy", command=buy_item)
+        quantity_dropdown = tk.OptionMenu(shop_window, selected_quantity, *quantity_options)
+        quantity_dropdown.pack()
+        
+        def buy_items():
+            selected_item_name = selected_item.get()  # Retrieve selected item name
+            quantity = int(selected_quantity.get())  # Retrieve selected quantity
+            total_cost = quantity * 10
+
+            # Check if the player has enough gold
+            total_cost = quantity * 10
+            if self.player.get_gold() < total_cost:
+                messagebox.showerror("Error", "You don't have enough gold to purchase these items.")
+                return
+
+            # Remove gold from the player
+            self.player.remove_gold(total_cost)
+
+            # Add items to the player's inventory
+            for _ in range(quantity):
+                for item in self.currentRoom.encounter.shop_encounter.shop_inventory:
+                    if item.name == selected_item_name:
+                        self.player.add_to_inventory(item)
+                        break  # Exit the inner loop once the item is found
+
+            # Inform the player about the purchase
+            messagebox.showinfo("Success", f"You purchased {quantity} {selected_item_name}(s).")
+                # Create button to buy items
+            
+        buy_button = tk.Button(shop_window, text="Buy", command=buy_items)
         buy_button.pack()
 
         # Create button to exit the shop

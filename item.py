@@ -19,7 +19,8 @@ class ItemTypes(Enum):
     SHIELD = 6
     ARMOUR = 7
     KEY = 8
-
+    SHOP = 9
+    
 # Must be set for other code to work
 max_item_types = 8
 
@@ -33,7 +34,7 @@ class Item:
         self.name = name
         self.description = description
         self.type = item_type
-        self.price = None
+        self.price = attribute_value
 
         # 'attributeValue' contains the attribute of the item, based on the item type.
         # For a sword this value would be the attack buff, and a shield / armour it would be the defense buff.

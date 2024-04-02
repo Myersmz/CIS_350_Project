@@ -99,15 +99,23 @@ class Encounter:
             self.empty_room()
 
 class ShopEncounter:
-        
-        def __init__(self):
-            # Load shop inventory from items.json
-            with open("items.json", "r") as file:
-                items = json.load(file)
-                self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION']) for item in items.get("CONSUMABLES", [])]
-        
-        # Return string representation of shop items
-        def display_shop_inventory(self):
-            """Returns a string representation of shop items for the label."""
-            item_strings = [f"{item.name} ({item.price} coins): {item.description}" for item in self.shop_inventory]
-            return "\n".join(item_strings)
+    def __init__(self):
+        # Load shop inventory from items.json
+        with open("items.json", "r") as file:
+            items = json.load(file)
+            self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION'], item_type=ItemTypes.SHOP, attribute_value=item['ATTRIBUTE']) for item in items.get("SHOP")]
+
+    # Return string representation of shop items
+    def display_shop_inventory(self):
+        """Returns a string representation of shop items for the label."""
+        item_strings = [f"{item.name} ({item.price} coins): {item.description}" for item in self.shop_inventory]
+        return "\n".join(item_strings)
+
+    def display_items(self):
+        return [item.name for item in self.shop_inventory]
+
+    def get_item_price(self, item_name):
+        for item in self.shop_inventory:
+            if item.name == item_name:
+                return item.price
+        return None  # Item not found
