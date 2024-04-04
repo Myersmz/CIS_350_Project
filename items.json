@@ -22,7 +22,7 @@
     {"NAME": "Reinforced Wooden Shield", "DESCRIPTION": "It's assembled with metalic parts, it seems strong.", "ATTRIBUTE": 5, "RARITY": 12},
     {"NAME": "Iron Shield", "DESCRIPTION": "A fully iron shield.", "ATTRIBUTE": 8, "RARITY": 4}
   ],
-  "POTIONS": [
+  "POTION": [
     {"NAME": "Healing Potion", "DESCRIPTION": "Heals some health", "ATTRIBUTE": [4,12], "RARITY": 4}
   ],
   "ITEM": [

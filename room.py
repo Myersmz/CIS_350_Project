@@ -1,6 +1,6 @@
-import character
 from encounter import *
 from item import *
+import character
 
 
 class Room:
@@ -116,6 +116,20 @@ class Room:
     #         self.items.append(item)
     #     else:
     #         raise(TypeError, "Not a valid item")
+
+    def remove_item(self, item: Item):
+        """
+        Removes an item from the inventory.
+        :param item: Item from the inventory.
+        """
+        if item not in self.items:
+            raise ValueError("This item is not in the inventory.")
+
+        for i in range(len(self.items)):
+            if self.items[i] == item:
+                self.items.pop(i)
+                return
+        raise OverflowError("Could not locate the item in the inventory.")
          
     def directions(self):
         """

@@ -1,18 +1,16 @@
 import tkinter as tk
 from tkinter import messagebox
+
 from character import *
-from encounter import *
-from room import *
-from item import *
+from floor import *
 import pickle
-import random
 
 
-class Gui():
+class Gui:
 
     def __init__(self):
         self.player = None
-        self.currentRoom = None
+        self.floor = None
         self.game_started = False
         self.dungeonSize = 14
         self.start_menu_screen()
@@ -32,27 +30,40 @@ class Gui():
         self.screen_menu.mainloop()
 
     def play(self):
-        self.character_creation_window = tk.Toplevel()
-        self.character_creation_window.geometry("400x300")
-        self.character_creation_window.title("Character Creation")
+        self.character_menu = tk.Toplevel()
+        self.character_menu.geometry("400x300")
+        self.character_menu.title("Character Creation")
 
-        label_name = tk.Label(self.character_creation_window, text="Name: ")
+        label_name = tk.Label(self.character_menu, text="Name: ")
         label_name.grid(row=0, column=0)
 
-        self.entry_name = tk.Entry(self.character_creation_window)
+        self.entry_name = tk.Entry(self.character_menu)
         self.entry_name.grid(row=0, column=1)
 
-        button_enter = tk.Button(self.character_creation_window, text='Enter', command=self.get_name)
+        button_enter = tk.Button(self.character_menu, text='Enter', command=self.get_name)
         button_enter.grid(row=1, columnspan=2)
 
     def get_name(self):
         self.player = Character(self.entry_name.get(), 25, 6, 4)
-        self.character_creation_window.destroy()
+        self.player.add_gold(25)
+
+        self.character_menu.destroy()
         self.screen_menu.destroy()
-        self.generateRooms()
+        self.floor = Floor()
         self.game_started = True
         self.game_screen()
         self.enterRoom()
+
+    def save(self):
+        # Creates a dictionary to pickle all needed game objects. Any other needed objects are easily addable.
+        saveObject = {
+            "Floor": self.floor,
+            "Player": self.player
+        }
+
+        # Dumps the saveObject to the working directory of the script.
+        pickle.dump(saveObject, open("savefile", "wb"))
+        messagebox.showinfo('Success', message='Save Successful')
 
     def load(self):
         # Loads the saveObject dictionary from a savefile-file in the working directory.
@@ -60,7 +71,7 @@ class Gui():
             Object = pickle.load(open("savefile", "rb"))
 
             # Restores the objects from the dictionary.
-            self.currentRoom = Object.get("Rooms", None)
+            self.floor = Object.get("Floor", None)
             self.player = Object.get("Player", None)
             self.game_started = True
             self.screen_menu.destroy()
@@ -129,45 +140,97 @@ class Gui():
         self.enterRoom()
         self.screen_game.mainloop()
 
+    def boss_confirmation(self, direction: int):
+        boss_notice = tk.Toplevel()
+        boss_notice.geometry("400x300")
+        boss_notice.title("Warning")
+
+        def yes():
+            boss_notice.destroy()
+            self.floor.current_room = self.floor.room().adjacentRooms[direction]
+            self.enterRoom()
+            return
+
+        def no():
+            boss_notice.destroy()
+            return
+
+        label_name = tk.Label(boss_notice, text="The next room contains a Boss\nDo you want to continue?")
+        label_name.grid(row=0, column=0)
+
+        confirm = tk.Button(boss_notice, text='Enter', command=yes)
+        confirm.grid(row=1, column=1, columnspan=2)
+
+        turn_back = tk.Button(boss_notice, text='Turn back..', command=no)
+        turn_back.grid(row=1, column=3, columnspan=2)
+
     def west(self):
-        if self.currentRoom.is_dead_end(0):
+        if self.floor.room().is_dead_end(0):
             messagebox.showerror("Error", message='There is no room west of this room.\n')
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
+            return
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP and not self.floor.room().encounter.is_empty:
             messagebox.showerror("Error",
                                  message="You cannot go west because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
-        else:
-            self.currentRoom = self.currentRoom.adjacentRooms[0]
-            self.enterRoom()
+            return
+
+        next_room: Room = self.floor.room().adjacentRooms[0]
+        if next_room.encounter_type == EncounterTypes.BOSS:
+            if not self.boss_confirmation(0):
+                return
+
+        self.floor.current_room = next_room
+        self.enterRoom()
 
     def north(self):
-        if self.currentRoom.is_dead_end(1):
+        if self.floor.room().is_dead_end(1):
             messagebox.showerror("Error", message='There is no room north of this room.\n')
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
+            return
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP and not self.floor.room().encounter.is_empty:
             messagebox.showerror("Error",
                                  message="You cannot go north because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
-        else:
-            self.currentRoom = self.currentRoom.adjacentRooms[1]
-            self.enterRoom()
+            return
+
+        next_room: Room = self.floor.room().adjacentRooms[1]
+        if next_room.encounter_type == EncounterTypes.BOSS:
+            if not self.boss_confirmation(1):
+                return
+
+        self.floor.current_room = next_room
+        self.enterRoom()
 
     def east(self):
-        if self.currentRoom.is_dead_end(2):
+        if self.floor.room().is_dead_end(2):
             messagebox.showerror("Error", message='There is no room east of this room.')
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
+            return
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP and not self.floor.room().encounter.is_empty:
             messagebox.showerror("Error",
                                  message="You cannot go east because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
-        else:
-            self.currentRoom = self.currentRoom.adjacentRooms[2]
-            self.enterRoom()
+            return
+
+        next_room: Room = self.floor.room().adjacentRooms[2]
+        if next_room.encounter_type == EncounterTypes.BOSS:
+            if not self.boss_confirmation(2):
+                return
+
+        self.floor.current_room = next_room
+        self.enterRoom()
 
     def south(self):
-        if self.currentRoom.is_dead_end(3):
+        if self.floor.room().is_dead_end(3):
             messagebox.showerror("Error", message='There is no room south of this room.\n')
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
+            return
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP and not self.floor.room().encounter.is_empty:
             messagebox.showerror("Error",
                                  message="You cannot go south because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
-        else:
-            self.currentRoom = self.currentRoom.adjacentRooms[3]
-            self.enterRoom()
+            return
+
+        next_room: Room = self.floor.room().adjacentRooms[3]
+        if next_room.encounter_type == EncounterTypes.BOSS:
+            if not self.boss_confirmation(3):
+                return
+
+        self.floor.current_room = next_room
+        self.enterRoom()
 
     def guess_menu(self):
         self.guess_window = tk.Toplevel()
@@ -179,21 +242,21 @@ class Gui():
 
         self.entry_input = tk.Entry(self.guess_window)
         self.entry_input.grid(row=0, column=1)
-        if self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE \
-                and not self.currentRoom.encounter.is_empty:
+        if self.floor.room().encounter.encounter_type == EncounterTypes.PUZZLE \
+                and not self.floor.room().encounter.is_empty:
             button_enter = tk.Button(self.guess_window, text='Enter Guess', command=self.puzzle_guess)
             button_enter.grid(row=1, columnspan=2)
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP \
-                and not self.currentRoom.encounter.is_empty:
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
+                and not self.floor.room().encounter.is_empty:
             button_enter = tk.Button(self.guess_window, text='Enter Guess', command=self.trap_guess)
             button_enter.grid(row=1, columnspan=2)
 
     def guess(self):
-        if self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE \
-                and not self.currentRoom.encounter.is_empty:
+        if self.floor.room().encounter.encounter_type == EncounterTypes.PUZZLE \
+                and not self.floor.room().encounter.is_empty:
             self.guess_menu()
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP \
-                and not self.currentRoom.encounter.is_empty:
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
+                and not self.floor.room().encounter.is_empty:
             self.guess_menu()
         else:
             messagebox.showerror("Error", message="There is no unsolved puzzle in this room\n")
@@ -201,9 +264,9 @@ class Gui():
     def puzzle_guess(self):
         user_input = self.entry_input.get()
         self.guess_window.destroy()
-        if user_input.lower().strip() in self.currentRoom.encounter.answers:
+        if user_input.lower().strip() in self.floor.room().encounter.answers:
             messagebox.showinfo('Success', message='Well done!\n')
-            self.currentRoom.encounter.is_empty = True
+            self.floor.room().encounter.is_empty = True
             # TODO: possibly add reward item
         else:
             messagebox.showerror("Not Right", message='\nHm, not quite.\n')
@@ -212,9 +275,9 @@ class Gui():
     def trap_guess(self):
         user_input = self.entry_input.get()
         self.guess_window.destroy()
-        if user_input.lower().strip() in self.currentRoom.encounter.solutions:
+        if user_input.lower().strip() in self.floor.room().encounter.solutions:
             messagebox.showinfo('Success', message='\nThe doors quickly swing open and you are free to leave!!!\n')
-            self.currentRoom.encounter.is_empty = True
+            self.floor.room().encounter.is_empty = True
         else:
             messagebox.showerror("Not Right",
                                  message='\nThe doors remain firmly in place, it seems that was not quite the answer.\n')
@@ -230,11 +293,11 @@ class Gui():
         shop_label.pack()
 
         # Display shop inventory
-        shop_inventory_text = tk.Label(shop_window, text=self.currentRoom.encounter.shop_encounter.display_shop_inventory())
+        shop_inventory_text = tk.Label(shop_window, text=self.floor.room().encounter.shop_encounter.display_shop_inventory())
         shop_inventory_text.pack()
 
         # Dropdown for item selection
-        item_options = self.currentRoom.encounter.shop_encounter.display_items()
+        item_options = self.floor.room().encounter.shop_encounter.display_items()
         selected_item = tk.StringVar(shop_window)
         selected_item.set(item_options[0])
 
@@ -265,7 +328,7 @@ class Gui():
 
             # Add items to the player's inventory
             for _ in range(quantity):
-                for item in self.currentRoom.encounter.shop_encounter.shop_inventory:
+                for item in self.floor.room().encounter.shop_encounter.shop_inventory:
                     if item.name == selected_item_name:
                         self.player.add_to_inventory(item)
                         break  # Exit the inner loop once the item is found
@@ -282,57 +345,91 @@ class Gui():
         exit_button.pack()
 
     def enterRoom(self):
-        if self.currentRoom.encounter.is_empty:
+        if self.floor.room().encounter.is_empty:
             self.label.configure(text='You encounter an empty room')
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.BOSS:
-            self.label.configure(text=f'You encounter a {self.currentRoom.encounter.boss.name}')
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.BOSS:
+            self.label.configure(text=f'You encounter a {self.floor.room().encounter.boss.name}')
             try:
-                self.player.get_attacked(self.currentRoom.encounter.boss)
+                self.player.get_attacked(self.floor.room().encounter.boss)
             except CharacterDeathException:
                 self.game_started = False
                 messagebox.showerror("Oh NO", message='\nYou have died!!!')
                 self.screen_game.destroy()
                 self.start_menu_screen()
 
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.PUZZLE:
-            self.label.configure(text=f'You encounter a puzzle room: {self.currentRoom.encounter.puzzle_question}')
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.PUZZLE:
+            self.label.configure(text=f'You encounter a puzzle room: {self.floor.room().encounter.puzzle_question}')
 
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP:
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP:
             self.label.configure(text=f'The doors have quickly shut, trapping you in the room.\n' +
                                       f'You see a puzzle that seems to be connected to the doors\n' +
                                       f'The puzzle could probably open them, but the doors themselves\n' +
                                       f'Also look like they could be broken if you attacked them enough\n' +
-                                      f'{self.currentRoom.encounter.trap_problem}')
+                                      f'{self.floor.room().encounter.trap_problem}')
             
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.SHOP:
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.SHOP:
             self.label.configure(text="You have encountered a mysterious shop.")
             self.shop_window()
 
-        self.label2.configure(text=f'\nThere are rooms to the {self.currentRoom.directions()} of this room\n')
+        self.label2.configure(text=f'\nThere are rooms to the {self.floor.room().directions()} of this room\n')
 
     def attack(self):
-        if self.currentRoom.encounter.encounter_type == EncounterTypes.BOSS \
-                and not self.currentRoom.encounter.is_empty:
+        if self.floor.room().encounter.encounter_type == EncounterTypes.BOSS \
+                and not self.floor.room().encounter.is_empty:
             try:
-                self.currentRoom.encounter.boss.get_attacked(self.player)
+                self.floor.room().encounter.boss.get_attacked(self.player)
             except CharacterDeathException:
-                messagebox.showinfo('Success', message=f'The {self.currentRoom.encounter.boss.name} has been slain !!!')
-                self.currentRoom.encounter.is_empty = True
-        elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP \
-                and not self.currentRoom.encounter.is_empty:
+                messagebox.showinfo('Success', message=f'The {self.floor.room().encounter.boss.name} has been slain !!!')
+                self.floor.room().encounter.is_empty = True
+        elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
+                and not self.floor.room().encounter.is_empty:
             try:
-                self.currentRoom.encounter.door.get_attacked(self.player)
+                self.floor.room().encounter.door.get_attacked(self.player)
             except CharacterDeathException:
                 messagebox.showinfo('Success',
                                     message=f'The door splinters open and you are free to leave the room !!!')
-                self.currentRoom.encounter.is_empty = True
+                self.floor.room().encounter.is_empty = True
         else:
             messagebox.showerror("Error", message="There is no monster to attack\n")
         self.enterRoom()
 
     def pickup(self):
-        # TODO add functionality
-        messagebox.showerror("Error", message='Not implemented yet')
+        item_list = self.floor.room().items
+
+        # In progress
+        #
+        # if len(item_list) == 0:
+        #     messagebox.showerror("Pickup", message="The room is empty...")
+        #     return
+        #
+        # item_pickup_menu = tk.Toplevel()
+        # item_pickup_menu.geometry("200x400")
+        # item_pickup_menu.title("Pickup")
+        #
+        # label = tk.Label(item_pickup_menu, text="Pickup what?")
+        # label.pack()
+        #
+        # self.pickup_item_buttons = []
+        #
+        # i = 0
+        # pack = []
+        # for item in item_list:
+        #     attribute_name = ""
+        #     match item.type:
+        #         case ItemTypes.MELEE, ItemTypes.RANGED, ItemTypes.SPELLBOOK, ItemTypes.STAFF:
+        #             attribute_name = " attack"
+        #         case ItemTypes.SHIELD, ItemTypes.ARMOUR:
+        #             attribute_name = " defense"
+        #         case default:
+        #             pass
+        #
+        #     pack.append({"index": i, "item": item})
+        #     button = tk.Button(item_pickup_menu, text=f"{item.name}: {item.attributeValue}{attribute_name}",
+        #                        command=lambda: self.pickup_item(pack[i]))
+        #     self.pickup_item_buttons.append(button)
+        #     button.pack()
+        #     i += 1
+        # i+=20
 
     def inventory(self):
         self.inventory_window = tk.Toplevel()
@@ -365,68 +462,6 @@ class Gui():
 
         button_return = tk.Button(self.menu_window, text='Return to Game', command=self.menu_window.destroy)
         button_return.grid(row=3)
-
-    def save(self):
-        # Creates a dictionary to pickle all needed game objects. Any other needed objects are easily addable.
-        saveObject = {
-            "Rooms": self.currentRoom,
-            "Player": self.player
-        }
-
-        # Dumps the saveObject to the working directory of the script.
-        pickle.dump(saveObject, open("savefile", "wb"))
-        messagebox.showinfo('Success', message='Save Successful')
-
-    def generateRooms(self):
-        self.currentRoom = Room("Entrance")
-
-        # gridSize = (dungeonSize + 1) % 2 + (dungeonSize * 2)
-        rooms = [self.currentRoom]
-        roomMap = {0: {0: self.currentRoom}}
-
-        # Create rooms
-        createdRooms = 1
-
-        while createdRooms < self.dungeonSize:
-            selectedRoom = rooms[random.randint(0, len(rooms) - 1)]
-            direction = random.randint(0, 3)
-
-            if selectedRoom.adjacentRooms[direction] is None:
-                createdRooms += 1
-                newRoom = Room("Room " + str(createdRooms))
-
-                selectedRoom.assignRoom(newRoom, direction)
-                rooms.append(newRoom)
-
-                if roomMap.get(newRoom.position[0], None) is None:
-                    roomMap[newRoom.position[0]] = {newRoom.position[1]: newRoom}
-                else:
-                    roomMap[newRoom.position[0]][newRoom.position[1]] = newRoom
-
-                newRoom_position = newRoom.position
-
-                rm = roomMap.get(newRoom_position[0] - 1, {}).get(newRoom_position[1], None)
-                if rm is not None and rm != selectedRoom:
-                    rm.assignRoom(newRoom, 2)
-                rm = roomMap.get(newRoom_position[0], {}).get(newRoom_position[1] - 1, None)
-                if rm is not None and rm != selectedRoom:
-                    rm.assignRoom(newRoom, 3)
-                rm = roomMap.get(newRoom_position[0] + 1, {}).get(newRoom_position[1], None)
-                if rm is not None and rm != selectedRoom:
-                    rm.assignRoom(newRoom, 0)
-                rm = roomMap.get(newRoom_position[0], {}).get(newRoom_position[1] + 1, None)
-                if rm is not None and rm != selectedRoom:
-                    rm.assignRoom(newRoom, 1)
-
-        # Assign needed EncounterTypes.
-        other_rooms = [rooms.pop(0)]
-        for i in range(100, max_single_rooms+1):
-            position = random.randint(0, len(rooms) - 1)
-            rooms[position].encounter_type = EncounterTypes(i)
-            other_rooms.append(rooms.pop(position))
-
-        for room in rooms+other_rooms:
-            room.initiate()
 
 
 def main():

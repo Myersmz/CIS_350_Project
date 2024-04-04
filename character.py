@@ -1,15 +1,10 @@
 from item import *
+from statistic import Statistic
 
 # On load
 file = open("monsters.json", "r")
 monsters = json.load(file)
 file.close()
-
-floor_multipliers = {
-    "health": [],
-    "attack": [],
-    "defense": []
-}
 
 
 class Character:
@@ -78,7 +73,12 @@ class Character:
         print("Character Inventory:", self.inventory)
 
     def get_character_info(self):
-        return f"Character Name: {self.name}\nCharacter Health: {self.health}\nCharacter Attack: {self.base_attack}\nCharacter Defense: {self.base_defense}\nCharacter Inventory: {self.inventory}"
+        return f"Character Name: {self.name}\n" \
+               f"------~=====+=====~------\n" \
+               f"Character Health: {self.health}\n" \
+               f"Character Attack: {self.base_attack}\n" \
+               f"Character Defense: {self.base_defense}\n" \
+               f"Gold: {self.gold}"
 
     # Causes damage from one character to another, based on their attack and defense stats.
     def get_attacked(self, attacker):
@@ -87,7 +87,7 @@ class Character:
         self.health -= max(0, (damage - defense))
 
         if self.health <= 0:
-            if self.is_player:
+            if not self.is_player:
                 self.transfer_inventory(attacker)
             raise CharacterDeathException(f"Died to {attacker.name}", self)
 
@@ -104,7 +104,7 @@ class Character:
         if self.next_defense:
             return self.next_defense
 
-        multiplier = self.get_multiplier("defense")
+        multiplier = Statistic.get_multiplier(self.multipliers, "defense", is_monster=not self.is_player)
 
         strength = self.base_defense * multiplier
         strength += self.equipped_shield.get_attribute() * multiplier
@@ -122,31 +122,13 @@ class Character:
         if self.next_attack:
             return self.next_attack
 
-        multiplier = self.get_multiplier("attack")
+        multiplier = Statistic.get_multiplier(self.multipliers, "attack", is_monster=not self.is_player)
 
         strength = self.base_attack * multiplier
         strength += self.equipped_weapon.get_attribute() * multiplier
 
         self.next_attack = max(0, int(strength))
         return self.next_attack
-
-    def get_multiplier(self, stat_type: str = "health") -> float:
-        """
-        Calculates the total Stat multiplier for a specific type of stat.
-        :param stat_type: "health", "attack", "defense"
-        :return:
-        """
-        if stat_type not in self.multipliers.keys():
-            raise ValueError("Invalid multiplier type given.")
-
-        mult = 1.0
-        if not self.is_player:
-            for stat in floor_multipliers.get(stat_type):
-                mult *= stat.multiplier
-
-        for stat in self.multipliers.get(stat_type):
-            mult *= stat.multiplier
-        return mult
 
     def get_gold(self) -> int:
         return self.gold
@@ -173,13 +155,6 @@ class CharacterDeathException(BaseException):
     def __init__(self, st, character) -> None:
         super().__init__(st)
         self.character = character
-
-
-class Stat:
-    def __init__(self, name: str = "Mysterious Aura", multiplier: float = 1, duration: int = 0):
-        self.name = name
-        self.multiplier = multiplier
-        self.duration = duration
 
 
 def get_monster() -> Character:

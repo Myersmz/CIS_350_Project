@@ -1,8 +1,6 @@
-import random
 import character
 from character import Character
 from enum import Enum
-from shop import ShopEncounter
 from item import *
 
 # The largest value of the "safe to generate" EncounterTypes
@@ -97,6 +95,7 @@ class Encounter:
             self.shop_encounter = ShopEncounter()
         else:
             self.empty_room()
+
 
 class ShopEncounter:
     def __init__(self):

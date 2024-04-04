@@ -1,7 +1,7 @@
 import json
 import random
 from enum import Enum
-
+from statistic import Statistic
 
 file = open("items.json", "r")
 items = json.load(file)
@@ -20,7 +20,8 @@ class ItemTypes(Enum):
     ARMOUR = 7
     KEY = 8
     SHOP = 9
-    
+
+
 # Must be set for other code to work
 max_item_types = 8
 
@@ -30,11 +31,13 @@ class Item:
     Represent an item object to be utilized in the context of inventory and within environments.
     Supports creating an item from scratch, or randomly selecting a predefined item from "items.json".
     """
+
     def __init__(self, name="Unknown Item", description="Indescribable", item_type=ItemTypes.ITEM, attribute_value=0):
         self.name = name
         self.description = description
         self.type = item_type
         self.price = attribute_value
+        self.item_buff = 1
 
         # 'attributeValue' contains the attribute of the item, based on the item type.
         # For a sword this value would be the attack buff, and a shield / armour it would be the defense buff.
@@ -42,7 +45,7 @@ class Item:
         # It is possible for this value to be a list of 2 values to represent a range of its value.
         self.attributeValue = attribute_value
 
-    def generateItem(self, item_type=ItemTypes.ITEM):
+    def generateItem(self, item_type: ItemTypes = ItemTypes.ITEM):
         """
         Will set values of this object randomly using a pre-defined list.
         :param item_type: Type of item to get.
@@ -71,6 +74,8 @@ class Item:
                 file.close()
                 break
 
+        self.item_buff = Statistic.get_multiplier(stat_type="item", is_item=True)
+
         self.name = this_item.get("NAME")
         self.description = this_item.get("DESCRIPTION")
         self.attributeValue = this_item.get("ATTRIBUTE")
@@ -97,8 +102,8 @@ class Item:
         :return:
         """
         if type(self.attributeValue) == list:
-            return random.randint(self.attributeValue[0], self.attributeValue[1])
-        return self.attributeValue
+            return int(random.randint(self.attributeValue[0], self.attributeValue[1]) * self.item_buff)
+        return int(self.attributeValue * self.item_buff)
 
     def __str__(self):
         """
