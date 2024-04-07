@@ -9,53 +9,91 @@ import pickle
 class Gui:
 
     def __init__(self):
+        '''
+        Starts the game
+        '''
+        # setting variables
         self.player = None
         self.floor = None
         self.game_started = False
         self.dungeonSize = 14
+
+        # starting the start menu screen
         self.start_menu_screen()
 
     def start_menu_screen(self):
+        '''
+        This creates and starts the start menu
+        '''
+        # creating the screen
         self.screen_menu = tk.Tk()
-        self.screen_menu.geometry("500x500")
+        self.screen_menu.geometry("400x300")
         self.screen_menu.title("Start Menu")
+        self.screen_menu.grid_rowconfigure(0, weight=3) # label weight is higher to be bigger than the buttons
+        self.screen_menu.grid_rowconfigure([1,2,3], weight=1) # buttons weight
+        self.screen_menu.grid_columnconfigure(0, weight=1) # only one column
+        
+        # creating labels
         label_intro = tk.Label(self.screen_menu, text="Welcome to Run Escape! Select an Option Below")
-        label_intro.grid(row=0, padx=2, pady=2)
+        label_intro.grid(row=0, sticky="NESW")
+
+        # creating buttons
         button_play = tk.Button(self.screen_menu, text="Play", command=self.play)
-        button_play.grid(row=1, padx=2, pady=2)
+        button_play.grid(row=1, sticky="NESW")
         button_load = tk.Button(self.screen_menu, text="Load", command=self.load)
-        button_load.grid(row=2, padx=2, pady=2)
+        button_load.grid(row=2, sticky="NESW")
         button_quit = tk.Button(self.screen_menu, text="Quit", command=quit)
-        button_quit.grid(row=3, padx=2, pady=2)
+        button_quit.grid(row=3, sticky="NESW")
+
+        # starting the window
         self.screen_menu.mainloop()
 
     def play(self):
+        '''
+        This creates a top level menu for creating the character
+        '''
+        # creating the screen - Toplevel pops up without the mainloop() call
         self.character_menu = tk.Toplevel()
-        self.character_menu.geometry("400x300")
+        self.character_menu.geometry("300x100")
         self.character_menu.title("Character Creation")
+        self.character_menu.grid_rowconfigure([0,1], weight=1)
+        self.character_menu.grid_columnconfigure([0,1], weight=1)
 
+        # creating labels
         label_name = tk.Label(self.character_menu, text="Name: ")
-        label_name.grid(row=0, column=0)
+        label_name.grid(row=0, column=0,sticky="NESW")
 
+        # creating entries
         self.entry_name = tk.Entry(self.character_menu)
-        self.entry_name.grid(row=0, column=1)
+        self.entry_name.grid(row=0, column=1,sticky="NESW")
 
+        # creating buttons
         button_enter = tk.Button(self.character_menu, text='Enter', command=self.get_name)
-        button_enter.grid(row=1, columnspan=2)
+        button_enter.grid(row=1, columnspan=2,sticky="NESW")
+
+        # TODO: add class or other features???
 
     def get_name(self):
+        '''
+        Creates the player character based on info from the character_menu
+        '''
+        # creating  player
         self.player = Character(self.entry_name.get(), 25, 6, 4)
         self.player.add_gold(25)
 
+        # destroying the previous screens and menus
         self.character_menu.destroy()
         self.screen_menu.destroy()
+
+        # creating the floor and starting the game menu
         self.floor = Floor()
         self.game_started = True
         self.game_screen()
-        self.enterRoom()
 
     def save(self):
-        # Creates a dictionary to pickle all needed game objects. Any other needed objects are easily addable.
+        '''
+        Creates a dictionary to pickle all needed game objects. Any other needed objects are easily addable.
+        '''
         saveObject = {
             "Floor": self.floor,
             "Player": self.player
@@ -66,7 +104,9 @@ class Gui:
         messagebox.showinfo('Success', message='Save Successful')
 
     def load(self):
-        # Loads the saveObject dictionary from a savefile-file in the working directory.
+        '''
+        Loads the saveObject dictionary from a savefile-file in the working directory.
+        '''
         try:
             Object = pickle.load(open("savefile", "rb"))
 
@@ -74,70 +114,88 @@ class Gui:
             self.floor = Object.get("Floor", None)
             self.player = Object.get("Player", None)
             self.game_started = True
+
+            # destroy the screen menu if it is created
             self.screen_menu.destroy()
+
+            # start the game screen
             self.game_screen()
         except FileNotFoundError:
             messagebox.showerror("Error", message="Encountered an error while loading the savefile.")
 
     def quit(self):
+        '''
+        This creates a top level menu for quiting and asking the user if they want to save before quiting
+        '''
+        # creating the screen - Toplevel pops up without the mainloop() call
         self.quit_window = tk.Toplevel()
-        self.quit_window.geometry("400x300")
+        self.quit_window.geometry("300x100")
         self.quit_window.title("Quit Menu")
+        self.quit_window.grid_rowconfigure([0,1], weight=1)
+        self.quit_window.grid_columnconfigure([0,1], weight=1)
+
+        # creating labels
         label_quit = tk.Label(self.quit_window, text="Would you like to save before quitting?")
+        label_quit.grid(row=0, column=0, columnspan=2, sticky="NESW")
 
-        label_quit.grid(row=0, column=0, columnspan=2, padx=2, pady=2)
-
+        # creating buttons
         button_yes = tk.Button(self.quit_window, text="Yes", command=self.save_and_quit)
-        button_yes.grid(row=1, column=0, padx=2, pady=2)
-
+        button_yes.grid(row=1, column=0, sticky="NESW")
         button_no = tk.Button(self.quit_window, text="No", command=quit)
-        button_no.grid(row=1, column=1, padx=2, pady=2)
+        button_no.grid(row=1, column=1, sticky="NESW")
 
     def save_and_quit(self):
+        '''
+        Runs the save function then quits the program
+        '''
         self.save()
         quit()
 
     def game_screen(self):
+        '''
+        This creates a screen for playing the game
+        '''
+        
+        # creating the screen
         self.screen_game = tk.Tk()
-        self.screen_game.geometry("700x700")
+        self.screen_game.geometry("700x400")
         self.screen_game.title("Run Escape")
+        self.screen_game.grid_rowconfigure([2,3,4], weight=3)
+        self.screen_game.grid_rowconfigure([0,1], weight=1)
+        self.screen_game.grid_columnconfigure([0,1,2,3,4,5,6,7], weight=1)
 
-        self.label = tk.Label(self.screen_game, text="Hello World")
-        self.label.grid(row=0, column=0, columnspan=8, padx=2, pady=2)
+        # creating the labels
+        self.label = tk.Label(self.screen_game, text="...")
+        self.label.grid(row=0, column=0, columnspan=8, sticky="NESW")
+        self.label2 = tk.Label(self.screen_game, text="...")
+        self.label2.grid(row=1, column=0, columnspan=8, sticky="NESW")
 
-        self.label2 = tk.Label(self.screen_game, text="Hello World")
-        self.label2.grid(row=1, column=0, columnspan=8, padx=2, pady=2)
-
+        # creating the buttons
         button_west = tk.Button(self.screen_game, text="West", command=self.west)
-        button_west.grid(row=4, column=5, padx=2, pady=2)
-
+        button_west.grid(row=3, column=5, sticky="NESW")
         button_east = tk.Button(self.screen_game, text="East", command=self.east)
-        button_east.grid(row=4, column=7, padx=2, pady=2)
-
+        button_east.grid(row=3, column=7, sticky="NESW")
         button_north = tk.Button(self.screen_game, text="North", command=self.north)
-        button_north.grid(row=3, column=6, padx=2, pady=2)
-
+        button_north.grid(row=2, column=6, sticky="NESW")
         button_south = tk.Button(self.screen_game, text="South", command=self.south)
-        button_south.grid(row=5, column=6, padx=2, pady=2)
-
+        button_south.grid(row=4, column=6, sticky="NESW")
         button_guess = tk.Button(self.screen_game, text="Guess", command=self.guess)
-        button_guess.grid(row=4, column=2, padx=2, pady=2)
-
+        button_guess.grid(row=3, column=2, sticky="NESW")
         button_attack = tk.Button(self.screen_game, text="Attack", command=self.attack)
-        button_attack.grid(row=4, column=0, padx=2, pady=2)
-
+        button_attack.grid(row=3, column=0, sticky="NESW")
         button_pickup = tk.Button(self.screen_game, text="Pickup", command=self.pickup)
-        button_pickup.grid(row=5, column=1, padx=2, pady=2)
-
+        button_pickup.grid(row=4, column=1, sticky="NESW")
         button_inventory = tk.Button(self.screen_game, text="Inventory", command=self.inventory)
-        button_inventory.grid(row=3, column=1, padx=2, pady=2)
-
+        button_inventory.grid(row=2, column=1, sticky="NESW")
         button_stats = tk.Button(self.screen_game, text="Stats", command=self.stats)
-        button_stats.grid(row=3, column=3, padx=2, pady=2)
-
+        button_stats.grid(row=2, column=3, sticky="NESW")
         button_menu = tk.Button(self.screen_game, text="Menu", command=self.menu)
-        button_menu.grid(row=3, column=4, padx=2, pady=2)
+        button_menu.grid(row=2, column=4, sticky="NESW")
+
+        # enter the room to update the labels
         self.enterRoom()
+
+        #start the screen
         self.screen_game.mainloop()
 
     def boss_confirmation(self, direction: int):
