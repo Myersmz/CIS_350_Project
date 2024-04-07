@@ -122,6 +122,9 @@ class Gui:
             self.game_screen()
         except FileNotFoundError:
             messagebox.showerror("Error", message="Encountered an error while loading the savefile.")
+        except tk.TclError: # loading from the game menu
+            self.menu_window.destroy()
+            self.enterRoom()
 
     def quit(self):
         '''
@@ -160,8 +163,8 @@ class Gui:
         self.screen_game = tk.Tk()
         self.screen_game.geometry("700x400")
         self.screen_game.title("Run Escape")
-        self.screen_game.grid_rowconfigure([2,3,4], weight=3)
-        self.screen_game.grid_rowconfigure([0,1], weight=1)
+        self.screen_game.grid_rowconfigure([2,3,4], weight=3) # buttons weight
+        self.screen_game.grid_rowconfigure([0,1], weight=1) # labels weight
         self.screen_game.grid_columnconfigure([0,1,2,3,4,5,6,7], weight=1)
 
         # creating the labels
@@ -199,30 +202,44 @@ class Gui:
         self.screen_game.mainloop()
 
     def boss_confirmation(self, direction: int):
+        '''
+        This creates a top level menu for confirming if the player wants to enter a boss room
+        '''
+        # creating the screen - Toplevel pops up without the mainloop() call
         boss_notice = tk.Toplevel()
-        boss_notice.geometry("400x300")
+        boss_notice.geometry("300x200")
         boss_notice.title("Warning")
+        boss_notice.grid_rowconfigure([0,1], weight=1) 
+        boss_notice.grid_columnconfigure([0,1], weight=1)
 
+        # function for continuing entering the room
         def yes():
             boss_notice.destroy()
             self.floor.current_room = self.floor.room().adjacentRooms[direction]
             self.enterRoom()
             return
 
+        # function for cancelling entering the room
         def no():
             boss_notice.destroy()
             return
 
+        # creating labels
         label_name = tk.Label(boss_notice, text="The next room contains a Boss\nDo you want to continue?")
-        label_name.grid(row=0, column=0)
+        label_name.grid(row=0, column=0, columnspan=2, sticky="NESW")
 
+        # creating buttons
         confirm = tk.Button(boss_notice, text='Enter', command=yes)
-        confirm.grid(row=1, column=1, columnspan=2)
-
+        confirm.grid(row=1, column=0, sticky="NESW")
         turn_back = tk.Button(boss_notice, text='Turn back..', command=no)
-        turn_back.grid(row=1, column=3, columnspan=2)
+        turn_back.grid(row=1, column=1, sticky="NESW")
 
     def west(self):
+        '''
+        This function is used for attempting to go west
+        '''
+
+        # checking for errors
         if self.floor.room().is_dead_end(0):
             messagebox.showerror("Error", message='There is no room west of this room.\n')
             return
@@ -240,6 +257,11 @@ class Gui:
         self.enterRoom()
 
     def north(self):
+        '''
+        This function is used for attempting to go north
+        '''
+
+        # checking for errors
         if self.floor.room().is_dead_end(1):
             messagebox.showerror("Error", message='There is no room north of this room.\n')
             return
@@ -257,6 +279,11 @@ class Gui:
         self.enterRoom()
 
     def east(self):
+        '''
+        This function is used for attempting to go east
+        '''
+
+        # checking for errors
         if self.floor.room().is_dead_end(2):
             messagebox.showerror("Error", message='There is no room east of this room.')
             return
@@ -274,6 +301,11 @@ class Gui:
         self.enterRoom()
 
     def south(self):
+        '''
+        This function is used for attempting to go south
+        '''
+
+        # checking for errors
         if self.floor.room().is_dead_end(3):
             messagebox.showerror("Error", message='There is no room south of this room.\n')
             return
@@ -291,25 +323,39 @@ class Gui:
         self.enterRoom()
 
     def guess_menu(self):
+        '''
+        This creates a top level menu for attempting to guess a riddle or puzzle
+        '''
+
+        # creating the screen - Toplevel pops up without the mainloop() call
         self.guess_window = tk.Toplevel()
-        self.guess_window.geometry("400x300")
+        self.guess_window.geometry("300x100")
         self.guess_window.title("Guess Menu")
+        self.guess_window.grid_rowconfigure([0,1], weight=1) 
+        self.guess_window.grid_columnconfigure([0,1], weight=1)
 
+        # creating labels
         label_guess = tk.Label(self.guess_window, text="Guess: ")
-        label_guess.grid(row=0, column=0)
+        label_guess.grid(row=0, column=0, sticky="NESW")
 
+        # creating entries
         self.entry_input = tk.Entry(self.guess_window)
-        self.entry_input.grid(row=0, column=1)
+        self.entry_input.grid(row=0, column=1, sticky="NESW")
+
+        # creating button with command base don what type of room we are in 
         if self.floor.room().encounter.encounter_type == EncounterTypes.PUZZLE \
                 and not self.floor.room().encounter.is_empty:
             button_enter = tk.Button(self.guess_window, text='Enter Guess', command=self.puzzle_guess)
-            button_enter.grid(row=1, columnspan=2)
+            button_enter.grid(row=1, column=0, columnspan=2, sticky="NESW")
         elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
                 and not self.floor.room().encounter.is_empty:
             button_enter = tk.Button(self.guess_window, text='Enter Guess', command=self.trap_guess)
-            button_enter.grid(row=1, columnspan=2)
+            button_enter.grid(row=1, column=0, columnspan=2, sticky="NESW")
 
     def guess(self):
+        '''
+        This either opens the guess menu or shows an error based on the type of room the player is in at the time
+        '''
         if self.floor.room().encounter.encounter_type == EncounterTypes.PUZZLE \
                 and not self.floor.room().encounter.is_empty:
             self.guess_menu()
@@ -320,6 +366,9 @@ class Gui:
             messagebox.showerror("Error", message="There is no unsolved puzzle in this room\n")
 
     def puzzle_guess(self):
+        '''
+        This function is for guessing if the player is in a puzzle room
+        '''
         user_input = self.entry_input.get()
         self.guess_window.destroy()
         if user_input.lower().strip() in self.floor.room().encounter.answers:
@@ -331,6 +380,9 @@ class Gui:
         self.enterRoom()
 
     def trap_guess(self):
+        '''
+        This function is for guessing if the player is in a trap room
+        '''
         user_input = self.entry_input.get()
         self.guess_window.destroy()
         if user_input.lower().strip() in self.floor.room().encounter.solutions:
@@ -403,6 +455,9 @@ class Gui:
         exit_button.pack()
 
     def enterRoom(self):
+        '''
+        This function is for entering the room and updates the labels of the game screen
+        '''
         if self.floor.room().encounter.is_empty:
             self.label.configure(text='You encounter an empty room')
         elif self.floor.room().encounter.encounter_type == EncounterTypes.BOSS:
@@ -490,36 +545,60 @@ class Gui:
         # i+=20
 
     def inventory(self):
+        '''
+        This creates a top level menu for showing the stats of the player
+        '''
+
+        # creating the screen - Toplevel pops up without the mainloop() call
         self.inventory_window = tk.Toplevel()
         self.inventory_window.geometry("400x300")
         self.inventory_window.title("Inventory Menu")
+        #self.inventory_window.grid_rowconfigure([0,1], weight=1) # labels weight
+        #self.inventory_window.grid_columnconfigure([0,1,2,3,4,5,6,7], weight=1)
+
         label_inventory = tk.Label(self.inventory_window, text=self.player.inventory)
-        label_inventory.pack()
+        label_inventory.grid(row=0, column=0, sticky="NESW")
+        # TODO add each item as a radio button option to use the other buttons
+
         # TODO add drop, equip and use buttons
 
     def stats(self):
+        '''
+        This creates a top level menu for showing the stats of the player
+        '''
+
+        # creating the screen - Toplevel pops up without the mainloop() call
         self.stats_window = tk.Toplevel()
-        self.stats_window.geometry("400x300")
+        self.stats_window.geometry("250x250")
         self.stats_window.title("Stats Menu")
+        self.stats_window.grid_rowconfigure(0, weight=1) 
+        self.stats_window.grid_columnconfigure(0, weight=1)
+
+        # creating labels
         label_stats = tk.Label(self.stats_window, text=self.player.get_character_info())
-        label_stats.grid(row=0, column=0)
+        label_stats.grid(row=0, column=0, sticky="NESW")
 
     def menu(self):
+        '''
+        This creates a top level menu for showing the game menu
+        '''
+
+        # creating the screen - Toplevel pops up without the mainloop() call
         self.menu_window = tk.Toplevel()
-        self.menu_window.geometry("400x300")
+        self.menu_window.geometry("250x250")
         self.menu_window.title("Menu")
+        self.menu_window.grid_rowconfigure([0,1,2,3], weight=1) 
+        self.menu_window.grid_columnconfigure(0, weight=1)
 
+        # creating the buttons
         button_save = tk.Button(self.menu_window, text='Save', command=self.save)
-        button_save.grid(row=0)
-
+        button_save.grid(row=0, sticky="NESW")
         button_load = tk.Button(self.menu_window, text='Load', command=self.load)
-        button_load.grid(row=1)
-
+        button_load.grid(row=1, sticky="NESW")
         button_quit = tk.Button(self.menu_window, text='Quit', command=self.quit)
-        button_quit.grid(row=2)
-
+        button_quit.grid(row=2, sticky="NESW")
         button_return = tk.Button(self.menu_window, text='Return to Game', command=self.menu_window.destroy)
-        button_return.grid(row=3)
+        button_return.grid(row=3, sticky="NESW")
 
 
 def main():
