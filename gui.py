@@ -27,7 +27,7 @@ class Gui:
         '''
         # creating the screen
         self.screen_menu = tk.Tk()
-        self.screen_menu.geometry("400x300")
+        self.screen_menu.minsize(400,300)
         self.screen_menu.title("Start Menu")
         self.screen_menu.grid_rowconfigure(0, weight=3) # label weight is higher to be bigger than the buttons
         self.screen_menu.grid_rowconfigure([1,2,3], weight=1) # buttons weight
@@ -54,7 +54,7 @@ class Gui:
         '''
         # creating the screen - Toplevel pops up without the mainloop() call
         self.character_menu = tk.Toplevel()
-        self.character_menu.geometry("300x100")
+        self.character_menu.minsize(300,100)
         self.character_menu.title("Character Creation")
         self.character_menu.grid_rowconfigure([0,1], weight=1)
         self.character_menu.grid_columnconfigure([0,1], weight=1)
@@ -132,7 +132,7 @@ class Gui:
         '''
         # creating the screen - Toplevel pops up without the mainloop() call
         self.quit_window = tk.Toplevel()
-        self.quit_window.geometry("300x100")
+        self.quit_window.minsize(300,100)
         self.quit_window.title("Quit Menu")
         self.quit_window.grid_rowconfigure([0,1], weight=1)
         self.quit_window.grid_columnconfigure([0,1], weight=1)
@@ -161,7 +161,7 @@ class Gui:
         
         # creating the screen
         self.screen_game = tk.Tk()
-        self.screen_game.geometry("700x400")
+        self.screen_game.minsize(700,400)
         self.screen_game.title("Run Escape")
         self.screen_game.grid_rowconfigure([2,3,4], weight=3) # buttons weight
         self.screen_game.grid_rowconfigure([0,1], weight=1) # labels weight
@@ -207,7 +207,7 @@ class Gui:
         '''
         # creating the screen - Toplevel pops up without the mainloop() call
         boss_notice = tk.Toplevel()
-        boss_notice.geometry("300x200")
+        boss_notice.minsize(300,200)
         boss_notice.title("Warning")
         boss_notice.grid_rowconfigure([0,1], weight=1) 
         boss_notice.grid_columnconfigure([0,1], weight=1)
@@ -329,7 +329,7 @@ class Gui:
 
         # creating the screen - Toplevel pops up without the mainloop() call
         self.guess_window = tk.Toplevel()
-        self.guess_window.geometry("300x100")
+        self.guess_window.minsize(300,100)
         self.guess_window.title("Guess Menu")
         self.guess_window.grid_rowconfigure([0,1], weight=1) 
         self.guess_window.grid_columnconfigure([0,1], weight=1)
@@ -551,7 +551,7 @@ class Gui:
 
         # creating the screen - Toplevel pops up without the mainloop() call
         self.inventory_window = tk.Toplevel()
-        self.inventory_window.geometry("400x300")
+        self.inventory_window.minsize(400,300)
         self.inventory_window.title("Inventory Menu")
 
         # adding the buttons
@@ -599,7 +599,7 @@ class Gui:
 
         # creating the screen - Toplevel pops up without the mainloop() call
         self.stats_window = tk.Toplevel()
-        self.stats_window.geometry("250x250")
+        self.stats_window.minsize(250,250)
         self.stats_window.title("Stats Menu")
         self.stats_window.grid_rowconfigure(0, weight=1) 
         self.stats_window.grid_columnconfigure(0, weight=1)
@@ -615,7 +615,7 @@ class Gui:
 
         # creating the screen - Toplevel pops up without the mainloop() call
         self.menu_window = tk.Toplevel()
-        self.menu_window.geometry("250x250")
+        self.menu_window.minsize(250,250)
         self.menu_window.title("Menu")
         self.menu_window.grid_rowconfigure([0,1,2,3], weight=1) 
         self.menu_window.grid_columnconfigure(0, weight=1)
