@@ -546,15 +546,13 @@ class Gui:
 
     def inventory(self):
         '''
-        This creates a top level menu for showing the stats of the player
+        This creates a top level menu for showing the inventory of the player
         '''
 
         # creating the screen - Toplevel pops up without the mainloop() call
         self.inventory_window = tk.Toplevel()
         self.inventory_window.geometry("400x300")
         self.inventory_window.title("Inventory Menu")
-
-        # TODO add drop, equip and use buttons
 
         # adding the buttons
         drop_button = tk.Button(self.inventory_window, text='Drop', command=self.drop)
@@ -564,9 +562,9 @@ class Gui:
         use_button = tk.Button(self.inventory_window, text='Use', command=self.use)
         use_button.grid(row=0, column=2, sticky="NESW")
 
-        i=1
+        i=1 # represents the starting row for the first radio button
 
-         # Count item occurrences
+        # Count item occurrences
         item_counts = {}
         for item in self.player.inventory:
             item_counts[item.name] = item_counts.get(item.name, 0) + 1
@@ -584,12 +582,15 @@ class Gui:
         
     def drop(self):
         pass
+        # TODO add functionality
 
     def equip(self):
         pass
+        # TODO add functionality
 
     def use(self):
         pass
+        # TODO add functionality
 
     def stats(self):
         '''
