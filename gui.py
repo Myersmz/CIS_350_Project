@@ -553,14 +553,43 @@ class Gui:
         self.inventory_window = tk.Toplevel()
         self.inventory_window.geometry("400x300")
         self.inventory_window.title("Inventory Menu")
-        #self.inventory_window.grid_rowconfigure([0,1], weight=1) # labels weight
-        #self.inventory_window.grid_columnconfigure([0,1,2,3,4,5,6,7], weight=1)
-
-        label_inventory = tk.Label(self.inventory_window, text=self.player.inventory)
-        label_inventory.grid(row=0, column=0, sticky="NESW")
-        # TODO add each item as a radio button option to use the other buttons
 
         # TODO add drop, equip and use buttons
+
+        # adding the buttons
+        drop_button = tk.Button(self.inventory_window, text='Drop', command=self.drop)
+        drop_button.grid(row=0, column=0, sticky="NESW")
+        equip_button = tk.Button(self.inventory_window, text='Equip', command=self.equip)
+        equip_button.grid(row=0, column=1, sticky="NESW")
+        use_button = tk.Button(self.inventory_window, text='Use', command=self.use)
+        use_button.grid(row=0, column=2, sticky="NESW")
+
+        i=1
+
+         # Count item occurrences
+        item_counts = {}
+        for item in self.player.inventory:
+            item_counts[item.name] = item_counts.get(item.name, 0) + 1
+
+        # Add radiobuttons for each item name
+        for item_name, count in item_counts.items():
+            display_text = item_name if count == 1 else f"{item_name} x{count}"
+            radio_button= tk.Radiobutton(self.inventory_window, text = display_text, value = item_name)
+            radio_button.grid(row=i, column=0, columnspan=3, sticky="NESW")
+            i+=1
+
+        # setting up the window
+        self.inventory_window.grid_rowconfigure(list(range(i)), weight=1) 
+        self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
+        
+    def drop(self):
+        pass
+
+    def equip(self):
+        pass
+
+    def use(self):
+        pass
 
     def stats(self):
         '''
