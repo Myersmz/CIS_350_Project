@@ -46,7 +46,7 @@ class Room:
 
         for i in range(count):
             new_item = Item()
-            new_item_type = ItemTypes(random.randint(0, max_item_types))
+            new_item_type = ItemTypes(random.randint(0, max_item_types-1))
             new_item.generateItem(new_item_type)
             self.items.append(new_item)
 

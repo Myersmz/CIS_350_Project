@@ -99,10 +99,7 @@ class Encounter:
 
 class ShopEncounter:
     def __init__(self):
-        # Load shop inventory from items.json
-        with open("items.json", "r") as file:
-            items = json.load(file)
-            self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION'], item_type=ItemTypes.SHOP, attribute_value=item['ATTRIBUTE']) for item in items.get("SHOP")]
+        self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION'], item_type=ItemTypes.SHOP, attribute_value=item['ATTRIBUTE']) for item in items.get("SHOP")]
 
     # Return string representation of shop items
     def display_shop_inventory(self):

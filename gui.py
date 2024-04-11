@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 
+import floor
 from character import *
 from floor import *
 import pickle
@@ -18,6 +19,10 @@ class Gui:
         self.game_started = False
         self.dungeonSize = 14
 
+        # Battle Vars
+        self.fight_in_progress = False
+        self.current_enemy = None
+
         # starting the start menu screen
         self.start_menu_screen()
 
@@ -32,7 +37,7 @@ class Gui:
         self.screen_menu.grid_rowconfigure(0, weight=3) # label weight is higher to be bigger than the buttons
         self.screen_menu.grid_rowconfigure([1,2,3], weight=1) # buttons weight
         self.screen_menu.grid_columnconfigure(0, weight=1) # only one column
-        
+
         # creating labels
         label_intro = tk.Label(self.screen_menu, text="Welcome to Run Escape! Select an Option Below")
         label_intro.grid(row=0, sticky="NESW")
@@ -78,7 +83,10 @@ class Gui:
         Creates the player character based on info from the character_menu
         '''
         # creating  player
-        self.player = Character(self.entry_name.get(), 25, 6, 4)
+        name = self.entry_name.get()
+        if name == "":
+            return
+        self.player = Character(name, 25, 6, 4)
         self.player.add_gold(25)
 
         # destroying the previous screens and menus
@@ -158,7 +166,7 @@ class Gui:
         '''
         This creates a screen for playing the game
         '''
-        
+
         # creating the screen
         self.screen_game = tk.Tk()
         self.screen_game.minsize(700,400)
@@ -184,7 +192,7 @@ class Gui:
         button_south.grid(row=4, column=6, sticky="NESW")
         button_guess = tk.Button(self.screen_game, text="Guess", command=self.guess)
         button_guess.grid(row=3, column=2, sticky="NESW")
-        button_attack = tk.Button(self.screen_game, text="Attack", command=self.attack)
+        button_attack = tk.Button(self.screen_game, text="Attack", command=self.stage_attack)
         button_attack.grid(row=3, column=0, sticky="NESW")
         button_pickup = tk.Button(self.screen_game, text="Pickup", command=self.pickup)
         button_pickup.grid(row=4, column=1, sticky="NESW")
@@ -209,7 +217,7 @@ class Gui:
         boss_notice = tk.Toplevel()
         boss_notice.minsize(300,200)
         boss_notice.title("Warning")
-        boss_notice.grid_rowconfigure([0,1], weight=1) 
+        boss_notice.grid_rowconfigure([0,1], weight=1)
         boss_notice.grid_columnconfigure([0,1], weight=1)
 
         # function for continuing entering the room
@@ -331,7 +339,7 @@ class Gui:
         self.guess_window = tk.Toplevel()
         self.guess_window.minsize(300,100)
         self.guess_window.title("Guess Menu")
-        self.guess_window.grid_rowconfigure([0,1], weight=1) 
+        self.guess_window.grid_rowconfigure([0,1], weight=1)
         self.guess_window.grid_columnconfigure([0,1], weight=1)
 
         # creating labels
@@ -342,7 +350,7 @@ class Gui:
         self.entry_input = tk.Entry(self.guess_window)
         self.entry_input.grid(row=0, column=1, sticky="NESW")
 
-        # creating button with command base don what type of room we are in 
+        # creating button with command base don what type of room we are in
         if self.floor.room().encounter.encounter_type == EncounterTypes.PUZZLE \
                 and not self.floor.room().encounter.is_empty:
             button_enter = tk.Button(self.guess_window, text='Enter Guess', command=self.puzzle_guess)
@@ -445,7 +453,7 @@ class Gui:
 
             # Inform the player about the purchase
             messagebox.showinfo("Success", f"You purchased {quantity} {selected_item_name}(s).")
-                # Create button to buy items
+            # Create button to buy items
             
         buy_button = tk.Button(shop_window, text="Buy", command=buy_items)
         buy_button.pack()
@@ -454,27 +462,36 @@ class Gui:
         exit_button = tk.Button(shop_window, text="Exit", command=shop_window.destroy)
         exit_button.pack()
 
+    def end_game(self):
+        self.game_started = False
+        messagebox.showerror("Game over", message='\nYour journey has ended.')
+        self.screen_game.destroy()
+        self.start_menu_screen()
+
+    def update_room(self, label_text=""):
+        if len((mons := self.floor.room().monsters)) != 0:
+            label_text += f'\nMonsters: ' + ', '.join([x.name for x in mons])
+        if len((_items := self.floor.room().items)) != 0:
+            label_text += f'\nItems: ' + ', '.join([x.name for x in _items])
+        self.label.configure(text=label_text)
+
     def enterRoom(self):
         '''
         This function is for entering the room and updates the labels of the game screen
         '''
         if self.floor.room().encounter.is_empty:
-            self.label.configure(text='You encounter an empty room')
+            self.update_room('You encounter an empty room')
         elif self.floor.room().encounter.encounter_type == EncounterTypes.BOSS:
-            self.label.configure(text=f'You encounter a {self.floor.room().encounter.boss.name}')
-            try:
-                self.player.get_attacked(self.floor.room().encounter.boss)
-            except CharacterDeathException:
-                self.game_started = False
-                messagebox.showerror("Oh NO", message='\nYou have died!!!')
-                self.screen_game.destroy()
-                self.start_menu_screen()
+            self.fight_loop(self.floor.room().encounter.boss)
 
         elif self.floor.room().encounter.encounter_type == EncounterTypes.PUZZLE:
-            self.label.configure(text=f'You encounter a puzzle room: {self.floor.room().encounter.puzzle_question}')
+            self.update_room(f'You encounter a puzzle room: {self.floor.room().encounter.puzzle_question}')
 
         elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP:
-            self.label.configure(text=f'The doors have quickly shut, trapping you in the room.\n' +
+            if self.floor.room().encounter.is_empty:
+                self.update_room("The trap has been cleared")
+            else:
+                self.label.configure(text=f'The doors have quickly shut, trapping you in the room.\n' +
                                       f'You see a puzzle that seems to be connected to the doors\n' +
                                       f'The puzzle could probably open them, but the doors themselves\n' +
                                       f'Also look like they could be broken if you attacked them enough\n' +
@@ -486,63 +503,198 @@ class Gui:
 
         self.label2.configure(text=f'\nThere are rooms to the {self.floor.room().directions()} of this room\n')
 
-    def attack(self):
-        if self.floor.room().encounter.encounter_type == EncounterTypes.BOSS \
+    def stage_attack(self):
+        if self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
                 and not self.floor.room().encounter.is_empty:
-            try:
-                self.floor.room().encounter.boss.get_attacked(self.player)
-            except CharacterDeathException:
-                messagebox.showinfo('Success', message=f'The {self.floor.room().encounter.boss.name} has been slain !!!')
-                self.floor.room().encounter.is_empty = True
-        elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
-                and not self.floor.room().encounter.is_empty:
-            try:
-                self.floor.room().encounter.door.get_attacked(self.player)
-            except CharacterDeathException:
-                messagebox.showinfo('Success',
-                                    message=f'The door splinters open and you are free to leave the room !!!')
-                self.floor.room().encounter.is_empty = True
+            # try:
+            #     self.floor.room().encounter.door.get_attacked(self.player)
+            # except CharacterDeathException:
+            #     messagebox.showinfo('Success',
+            #                         message=f'The door splinters open and you are free to leave the room !!!')
+            #     self.floor.room().encounter.is_empty = True
+            self.fight_loop(self.floor.room().encounter.door)
+
+        elif len(self.floor.room().monsters) != 0:
+            self.fight_loop(self.floor.room().monsters[0])
         else:
-            messagebox.showerror("Error", message="There is no monster to attack\n")
-        self.enterRoom()
+            messagebox.showinfo("The room is empty", message="There is no monster to attack\n")
+
+    def attack(self):
+        print("Old Attack")
+        # if self.floor.room().encounter.encounter_type == EncounterTypes.BOSS \
+        #         and not self.floor.room().encounter.is_empty:
+        #     try:
+        #         self.floor.room().encounter.boss.get_attacked(self.player)
+        #     except CharacterDeathException:
+        #         messagebox.showinfo('Success', message=f'The {self.floor.room().encounter.boss.name} has been slain !!!')
+        #         self.floor.room().encounter.is_empty = True
+        # elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
+        #         and not self.floor.room().encounter.is_empty:
+        #     try:
+        #         self.floor.room().encounter.door.get_attacked(self.player)
+        #     except CharacterDeathException:
+        #         messagebox.showinfo('Success',
+        #                             message=f'The door splinters open and you are free to leave the room !!!')
+        #         self.floor.room().encounter.is_empty = True
+        # else:
+        #     messagebox.showerror("Error", message="There is no monster to attack\n")
+        # self.enterRoom()
+
+    def fight_loop(self, monster: Character):
+        fight_window = tk.Toplevel()
+        fight_window.geometry("400x400")
+        fight_window.title("Battle")
+
+        self.fight_in_progress = True
+        self.current_enemy = monster
+
+        fight_window.grid_rowconfigure([0, 1, 2, 3], weight=1)
+        fight_window.grid_rowconfigure(4, weight=2)  # label weight is higher to be bigger than the buttons
+        # fight_window.grid_rowconfigure(5, weight=1)  # buttons weight
+        fight_window.grid_columnconfigure([0, 1, 2], weight=1)  # only one column
+
+        # creating labels
+        battle_label = f"Fighting {monster.name}"
+        label_intro = tk.Label(fight_window, text=battle_label)
+        label_intro.grid(row=0, columnspan=3, sticky="NESW")
+
+        monster_stats = tk.Label(fight_window, text="")
+        monster_stats.grid(row=1, columnspan=3, sticky="NESW")
+
+        self.player.get_defense()
+        self.player.get_attack()
+
+        def throw_attack():
+            turn_dialogue = ""
+            try:
+                turn_dialogue += f"{monster.name}: " + monster.get_attacked(self.player) + "\n"
+            except CharacterDeathException as E:
+                fight_window.destroy()
+                turn_dialogue += f"{monster.name} was slain"
+                messagebox.showinfo('Success',
+                                    message=f'You have defeated the {monster.name}!\n{E.args[0]}')
+                self.fight_in_progress = False
+                self.current_enemy = None
+
+                # Check for door
+                if monster.name == "Door":
+                    self.floor.room().encounter.is_empty = True
+                elif self.floor.room().encounter.encounter_type == EncounterTypes.BOSS:
+                    messagebox.showinfo('Success',
+                                        message=f'You descend deeper into the depths')
+                    self.descend()
+                    return
+                else:
+                    self.floor.room().monsters.remove(monster)
+
+                self.update_room()
+                return
+
+            try:
+                turn_dialogue += f"{self.player.name}: " + self.player.get_attacked(monster) + "\n"
+            except CharacterDeathException:
+                self.fight_in_progress = False
+                self.current_enemy = None
+
+                turn_dialogue += f"{self.player.name} was slain"
+                dialogue.configure(text=turn_dialogue)
+                self.end_game()
+
+            dialogue.configure(text=turn_dialogue)
+
+            # Update Buffs
+            self.player.start_next_turn()
+            monster.start_next_turn()
+
+            # Update Text
+            update_fight_board()
+
+        def update_fight_board():
+            monster_stats.configure(text=f"Health: {monster.health} | "
+                                        f"Defense: {monster.get_defense()} |"
+                                        f"Next Attack: {monster.get_attack()}")
+
+            player_stats.configure(text=f"Health: {self.player.health} | "
+                                        f"Defense: {self.player.get_defense()} |"
+                                        f"Next Attack: {self.player.get_attack()}")
+
+        dialogue = tk.Label(fight_window, text="")
+        dialogue.grid(row=2, columnspan=3, sticky="NESW")
+
+        # Player Stats
+        player_stats = tk.Label(fight_window, text="")
+        player_stats.grid(row=3, columnspan=3, sticky="NESW")
+        update_fight_board()
+
+        # creating buttons
+        attack_button = tk.Button(fight_window, text="Attack", command=throw_attack)
+        attack_button.grid(row=4, column=0, sticky="NESW")
+        item_button = tk.Button(fight_window, text="Items", command=self.inventory)
+        item_button.grid(row=4, column=1,  sticky="NESW")
+
+        if self.floor.room().encounter.encounter_type != EncounterTypes.BOSS:
+            flee_button = tk.Button(fight_window, text="Flee", command=fight_window.destroy)
+            flee_button.grid(row=4, column=2,  sticky="NESW")
+
+        # starting the window
+        fight_window.mainloop()
 
     def pickup(self):
         item_list = self.floor.room().items
 
         # In progress
-        #
-        # if len(item_list) == 0:
-        #     messagebox.showerror("Pickup", message="The room is empty...")
-        #     return
-        #
-        # item_pickup_menu = tk.Toplevel()
-        # item_pickup_menu.geometry("200x400")
-        # item_pickup_menu.title("Pickup")
-        #
-        # label = tk.Label(item_pickup_menu, text="Pickup what?")
-        # label.pack()
-        #
-        # self.pickup_item_buttons = []
-        #
-        # i = 0
-        # pack = []
-        # for item in item_list:
-        #     attribute_name = ""
-        #     match item.type:
-        #         case ItemTypes.MELEE, ItemTypes.RANGED, ItemTypes.SPELLBOOK, ItemTypes.STAFF:
-        #             attribute_name = " attack"
-        #         case ItemTypes.SHIELD, ItemTypes.ARMOUR:
-        #             attribute_name = " defense"
-        #         case default:
-        #             pass
-        #
-        #     pack.append({"index": i, "item": item})
-        #     button = tk.Button(item_pickup_menu, text=f"{item.name}: {item.attributeValue}{attribute_name}",
-        #                        command=lambda: self.pickup_item(pack[i]))
-        #     self.pickup_item_buttons.append(button)
-        #     button.pack()
-        #     i += 1
-        # i+=20
+        if len(item_list) == 0:
+            messagebox.showerror("Pickup", message="The room is empty...")
+            return
+
+        self.item_pickup_menu = tk.Toplevel()
+        self.item_pickup_menu.geometry("200x400")
+        self.item_pickup_menu.title("Pickup")
+
+        label = tk.Label(self.item_pickup_menu, text="Pickup what?")
+        label.pack()
+
+        self.pickup_item_buttons = []
+
+        i = 0
+        for item in item_list:
+            attribute_name = ""
+            match item.type:
+                case ItemTypes.MELEE, ItemTypes.RANGED, ItemTypes.SPELLBOOK, ItemTypes.STAFF:
+                    attribute_name = " attack"
+                case ItemTypes.SHIELD, ItemTypes.ARMOUR:
+                    attribute_name = " defense"
+                case default:
+                    pass
+
+            button = tk.Button(self.item_pickup_menu, text=f"{item.name}: {item.attributeValue}{attribute_name}")
+            button.configure(command=lambda l_button=button, l_item=item: self.pickup_item(l_button, l_item))
+            self.pickup_item_buttons.append(button)
+            button.pack()
+            i += 1
+
+        def close_command():
+            self.item_pickup_menu.destroy()
+            for b in self.pickup_item_buttons:
+                b.destroy()
+
+        close_button = tk.Button(self.item_pickup_menu, anchor="s", text="Close", command=close_command)
+        close_button.pack()
+
+    def pickup_item(self, button: tk.Button, item: Item):
+        button.destroy()
+        self.player.add_to_inventory(item)
+
+        for i in range(len(self.floor.room().items)):
+            if item == self.floor.room().items[i]:
+                self.floor.room().items.pop(i)
+                break
+
+        self.update_room()
+
+        self.pickup_item_buttons.remove(button)
+        if len(self.pickup_item_buttons) == 0:
+            self.item_pickup_menu.destroy()
 
     def inventory(self):
         '''
@@ -577,20 +729,100 @@ class Gui:
             i+=1
 
         # setting up the window
-        self.inventory_window.grid_rowconfigure(list(range(i)), weight=1) 
+        self.inventory_window.grid_rowconfigure(list(range(i)), weight=1)
         self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
-        
-    def drop(self):
-        pass
-        # TODO add functionality
 
-    def equip(self):
-        pass
-        # TODO add functionality
+    def drop(self, item):
+        if item not in self.player.inventory:
+            raise ValueError("Item does not exist in the inventory.")
 
-    def use(self):
-        pass
-        # TODO add functionality
+        self.player.inventory.remove(item)
+        self.floor.room().items.append(item)
+        self.inventory()
+
+    def equip(self, item):
+        try:
+            self.player.equip_from_inventory(item)
+        except:
+            pass
+
+        self.inventory()
+
+    def use(self, item):
+        if item.type not in [ItemTypes.SHOP, ItemTypes.POTION, ItemTypes.ITEM]:
+            return
+
+        message = ""
+
+        if item.name == "Crude Healing Potion":
+            attribute = item.get_attribute()
+            self.player.health += attribute
+            self.player.inventory.remove(item)
+            message = f"Healed {attribute} health"
+
+        elif item.name == "Crude Weakness Potion":
+            if not self.fight_in_progress:
+                message = "Not in a fight!"
+            else:
+                self.player.inventory.remove(item)
+                attribute = pow(item.attributeValue + item.item_buff, -1)
+                debuff = Statistic("Weakness", multiplier=attribute, duration=3)
+                self.current_enemy.multipliers["attack"].append(debuff)
+                message = f"Applied weakness"
+
+        elif item.name == "Crude Poison Potion":
+            if not self.fight_in_progress:
+                message = "Not in a fight!"
+            else:
+                self.player.inventory.remove(item)
+                attribute = pow(item.attributeValue + item.item_buff, -1)
+                debuff = Statistic("Poison", multiplier=attribute, duration=3)
+                self.current_enemy.multipliers["defense"].append(debuff)
+                message = f"Applied poison"
+
+        elif item.name == "Pineapple Pizza":
+            attribute = item.get_attribute()
+            self.player.health += attribute
+            self.player.inventory.remove(item)
+            message = f"Healed {attribute} health"
+
+        elif item.name == "Defense Potion":
+            attribute = item.attributeValue * item.item_buff
+            buff = Statistic("Defense Buff", multiplier=attribute, duration=5)
+            self.player.multipliers["defense"].append(buff)
+            self.player.inventory.remove(item)
+            message = "Applied defense buff"
+
+        elif item.name == "Attack Potion":
+            attribute = item.attributeValue * item.item_buff
+            buff = Statistic("Attack Buff", multiplier=attribute, duration=5)
+            self.player.multipliers["attack"].append(buff)
+            self.player.inventory.remove(item)
+            message = "Applied attack buff"
+
+        elif item.name == "Weakness Potion":
+            if not self.fight_in_progress:
+                message = "Not in a fight!"
+            else:
+                self.player.inventory.remove(item)
+                attribute = pow(item.attributeValue + item.item_buff, -1)
+                debuff = Statistic("Weakness", multiplier=attribute, duration=5)
+                self.current_enemy.multipliers["attack"].append(debuff)
+                message = f"Applied weakness"
+
+        elif item.name == "Poison Potion":
+            if not self.fight_in_progress:
+                message = "Not in a fight!"
+            else:
+                self.player.inventory.remove(item)
+                attribute = pow(item.attributeValue + item.item_buff, -1)
+                debuff = Statistic("Poison", multiplier=attribute, duration=5)
+                self.current_enemy.multipliers["defense"].append(debuff)
+                message = f"Applied poison"
+        else:
+            message = "I don't know how to use that item.."
+
+        messagebox.showinfo('Use item', message=message)
 
     def stats(self):
         '''
@@ -601,7 +833,7 @@ class Gui:
         self.stats_window = tk.Toplevel()
         self.stats_window.minsize(250,250)
         self.stats_window.title("Stats Menu")
-        self.stats_window.grid_rowconfigure(0, weight=1) 
+        self.stats_window.grid_rowconfigure(0, weight=1)
         self.stats_window.grid_columnconfigure(0, weight=1)
 
         # creating labels
@@ -617,7 +849,7 @@ class Gui:
         self.menu_window = tk.Toplevel()
         self.menu_window.minsize(250,250)
         self.menu_window.title("Menu")
-        self.menu_window.grid_rowconfigure([0,1,2,3], weight=1) 
+        self.menu_window.grid_rowconfigure([0,1,2,3], weight=1)
         self.menu_window.grid_columnconfigure(0, weight=1)
 
         # creating the buttons
@@ -629,6 +861,10 @@ class Gui:
         button_quit.grid(row=2, sticky="NESW")
         button_return = tk.Button(self.menu_window, text='Return to Game', command=self.menu_window.destroy)
         button_return.grid(row=3, sticky="NESW")
+
+    def descend(self):
+        self.floor.generate_new_floor()
+        self.enterRoom()
 
 
 def main():

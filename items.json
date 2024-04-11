@@ -23,7 +23,9 @@
     {"NAME": "Iron Shield", "DESCRIPTION": "A fully iron shield.", "ATTRIBUTE": 8, "RARITY": 4}
   ],
   "POTION": [
-    {"NAME": "Healing Potion", "DESCRIPTION": "Heals some health", "ATTRIBUTE": [4,12], "RARITY": 4}
+    {"NAME": "Crude Healing Potion", "DESCRIPTION": "Heals some health", "ATTRIBUTE": [4,12], "RARITY": 4},
+    {"NAME": "Crude Weakness Potion", "DESCRIPTION": "Reduces enemy attack for 3 turns", "ATTRIBUTE": 0.8, "RARITY": 4},
+    {"NAME": "Crude Poison Potion", "DESCRIPTION": "Reduces enemy defense for 3 turns", "ATTRIBUTE": 0.8, "RARITY": 4}
   ],
   "ITEM": [
     {"NAME": "Skull", "DESCRIPTION": "Someone has been here before.", "ATTRIBUTE": 0, "RARITY": 6},
@@ -42,8 +44,10 @@
     {"NAME": "Broken Key", "DESCRIPTION": "Too damaged to be useful.", "ATTRIBUTE": 0, "RARITY":  1}
   ],
   "SHOP": [
-    {"NAME": "Pineapple Pizza", "DESCRIPTION": "Heals some health", "ATTRIBUTE": 10, "RARITY": 0},
-    {"NAME": "Defense Potion", "DESCRIPTION": "Boosts defense", "ATTRIBUTE": 10, "RARITY": 0},
-    {"NAME": "Attack Potion", "DESCRIPTION": "Boosts attack", "ATTRIBUTE": 10, "RARITY": 0}
+    {"NAME": "Pineapple Pizza", "DESCRIPTION": "Heals 15 health", "ATTRIBUTE": 15, "RARITY": 0},
+    {"NAME": "Defense Potion", "DESCRIPTION": "Boosts defense for 5 turns", "ATTRIBUTE": 1.8, "RARITY": 0},
+    {"NAME": "Attack Potion", "DESCRIPTION": "Boosts attack for 5 turns", "ATTRIBUTE": 1.8, "RARITY": 0},
+    {"NAME": "Weakness Potion", "DESCRIPTION": "Reduces enemy attack for 5 turns", "ATTRIBUTE": 0.5, "RARITY": 0},
+    {"NAME": "Poison Potion", "DESCRIPTION": "Reduces enemy defense for 5 turns", "ATTRIBUTE": 0.5, "RARITY": 0}
   ]
 }

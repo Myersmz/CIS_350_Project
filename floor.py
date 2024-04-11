@@ -1,35 +1,36 @@
 from room import *
 from statistic import Statistic, multipliers
 
-dungeon_size = 8
-cleared_floors = 0
-
 
 class Floor:
     def __init__(self):
-        Floor.increase_difficulty()
-        self.current_room = Floor.generate_floor()
+        self.dungeon_size = 8
+        self.cleared_floors = 0
+
+        self.current_room = self.generate_floor()
+
+    def generate_new_floor(self):
+        self.increase_difficulty()
+        self.current_room = self.generate_floor()
 
     def room(self) -> Room:
         return self.current_room
 
-    @staticmethod
-    def increase_difficulty():
+    def increase_difficulty(self):
         """
         Increases the games difficultly by applying universal stat buffs and increases the floor size.
         Also increases the effectiveness of items.
         """
-        global dungeon_size
 
         # Returns a multiplier value
         def random_buff_value():
             return (random.randint(10, 35) + 100) / 100
 
         # Checks for this being the first floor of the game.
-        if cleared_floors == 0:
+        if self.cleared_floors == 0:
             return
 
-        dungeon_size += 4
+        self.dungeon_size += 4
 
         attack_buff = random_buff_value()
         defense_buff = random_buff_value()
@@ -44,13 +45,15 @@ class Floor:
         # Sets stats for item spawns. This is an attempt to balance difficulty.
         multipliers["item"].append(Statistic("Mystical Aura", multiplier=item_buff))
 
-    @staticmethod
-    def generate_floor(room_count: int = dungeon_size):
+    def generate_floor(self, room_count: int = None):
         """
         Generates all rooms for a playable game.
         :param room_count: Number of rooms to generate. Default: follows difficulty increase.
         :return:Room - Entrance to the floor
         """
+        if room_count is None:
+            room_count = self.dungeon_size
+
         entrance = Room("Floor Entrance")
         entrance.encounter_type = EncounterTypes.EMPTY
         rooms = [entrance]

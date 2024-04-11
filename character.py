@@ -34,9 +34,9 @@ class Character:
         self.inventory = []
         self.gold = 0
 
-        self.equipped_weapon: Item = Item("Hands", "", item_type=ItemTypes.MELEE, attribute_value=3)
-        self.equipped_shield: Item = Item("None", "", ItemTypes.ITEM, attribute_value=0)
-        self.equipped_armour: Item = Item("None", "", ItemTypes.ITEM, attribute_value=0)
+        self.equipped_weapon: Item = Item("None", "", item_type=ItemTypes.MELEE, attribute_value=0)
+        self.equipped_shield: Item = Item("None", "", item_type=ItemTypes.SHIELD, attribute_value=0)
+        self.equipped_armour: Item = Item("None", "", item_type=ItemTypes.SHIELD, attribute_value=0)
 
     def assign_player(self):
         """
@@ -44,10 +44,20 @@ class Character:
         :return:
         """
         self.is_player = True
+        self.equipped_weapon: Item = Item("Hands", "", item_type=ItemTypes.MELEE, attribute_value=3)
 
     def start_next_turn(self):
         self.next_attack = None
         self.next_defense = None
+
+        for key in self.multipliers.keys():
+            for mult in self.multipliers.get(key):
+                if mult.duration == 1:
+                    self.multipliers[key].remove(mult)
+                elif mult.duration == 0:
+                    continue
+                else:
+                    mult.duration -= 1
 
     # Adds an item to inventory
     def add_to_inventory(self, item):
@@ -61,8 +71,28 @@ class Character:
         if item in self.inventory:
             self.inventory.remove(item)
 
-    def equip_from_inventory(self):
-        pass
+    def equip_from_inventory(self, item: Item):
+        if item not in self.inventory:
+            raise ValueError("Item is not in my inventory")
+
+        old_item = None
+        if item.type in [ItemTypes.MELEE, ItemTypes.STAFF, ItemTypes.SPELLBOOK, ItemTypes.RANGED]:
+            old_item = self.equipped_weapon
+            self.equipped_weapon = item
+            self.inventory.remove(item)
+        elif item.type == ItemTypes.SHIELD:
+            old_item = self.equipped_shield
+            self.equipped_shield = item
+            self.inventory.remove(item)
+        elif item.type == ItemTypes.ARMOUR:
+            old_item = self.equipped_armour
+            self.equipped_armour = item
+            self.inventory.remove(item)
+        else:
+            raise ValueError("Item is not equippable")
+
+        if old_item.name != "None":
+            self.inventory.append(old_item)
 
     # Prints character information
     def print_character_info(self):
@@ -84,16 +114,27 @@ class Character:
     def get_attacked(self, attacker):
         damage = attacker.get_attack()
         defense = self.get_defense()
-        self.health -= max(0, (damage - defense))
+        attack = max(0, (damage - defense))
+        self.health -= attack
 
         if self.health <= 0:
             if not self.is_player:
-                self.transfer_inventory(attacker)
-            raise CharacterDeathException(f"Died to {attacker.name}", self)
+                raise CharacterDeathException(self.transfer_inventory(attacker), self)
+            raise CharacterDeathException(f"", self)
+        else:
+            return f"Took {attack} damage"
 
     def transfer_inventory(self, target):
+        item_str = "Obtained\n"
+
+        if len(self.inventory) == 0:
+            return "Obtained no items"
+
         while len(self.inventory) > 0:
-            target.add_to_inventory(self.inventory.pop(0))
+            item = self.inventory.pop(0)
+            item_str += f"{item.name}: {item.attributeValue}\n"
+            target.add_to_inventory(item)
+        return item_str
 
     def get_defense(self) -> int:
         """
@@ -160,7 +201,7 @@ class CharacterDeathException(BaseException):
 def get_monster() -> Character:
     monster_list = monsters.get("monster")
 
-    monster = monster_list[random.randint(0, len(monsters) - 1)]
+    monster = monster_list[random.randint(0, len(monster_list) - 1)]
 
     if type(health := monster.get("health")) == list:
         monster_health = random.randint(health[0], health[1])
@@ -181,15 +222,15 @@ def get_monster() -> Character:
 
     gold_value = random.randint(0, 20)
     if gold_value != 0:
-        new_monster.add_to_inventory(Item("Gold", description="Used to buy items at the shop",
+        new_monster.inventory.append(Item("Gold", description="Used to buy items at the shop",
                                           attribute_value=gold_value))
     return new_monster
 
 
 def get_boss():
-    monster_list = monsters.get("boss")
+    boss_list = monsters.get("boss")
 
-    boss = monster_list[random.randint(0, len(monsters) - 1)]
+    boss = boss_list[random.randint(0, len(boss_list) - 1)]
 
     if type(health := boss.get("health")) == list:
         boss_health = random.randint(health[0], health[1])
@@ -210,7 +251,7 @@ def get_boss():
 
     gold_value = random.randint(40, 200)
     if gold_value != 0:
-        new_boss.add_to_inventory(Item("Gold", description="Used to buy items at the shop",
+        new_boss.inventory.append(Item("Gold", description="Used to buy items at the shop",
                                        attribute_value=gold_value))
     return new_boss
 
