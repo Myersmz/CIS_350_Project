@@ -25,6 +25,7 @@ class Room:
         self.adjacentRooms = [left, up, right, down]
         self.encounter = None
         self.monsters = []
+        self.visited = False
 
     def initiate(self):
         self.encounter = Encounter(self.encounter_type)

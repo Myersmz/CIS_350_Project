@@ -21,6 +21,7 @@ class Character:
         self.health = health
         self.base_attack = attack
         self.base_defense = defense
+        self.score = 0
 
         self.next_defense = None
         self.next_attack = None
@@ -101,6 +102,7 @@ class Character:
         print("Character Attack:", self.base_attack)
         print("Character Defense:", self.base_defense)
         print("Character Inventory:", self.inventory)
+        print("Current Score: ", self.score)
 
     def get_character_info(self):
         return f"Character Name: {self.name}\n" \
@@ -108,9 +110,10 @@ class Character:
                f"Character Health: {self.health}\n" \
                f"Character Attack: {self.base_attack}\n" \
                f"Character Defense: {self.base_defense}\n" \
-               f"Gold: {self.gold}"
+               f"Gold: {self.gold}\n" \
+               f"Current Score: {self.score}"
 
-    # Causes damage from one character to another, based on their attack and defense stats.
+            # Causes damage from one character to another, based on their attack and defense stats.
     def get_attacked(self, attacker):
         damage = attacker.get_attack()
         defense = self.get_defense()
@@ -187,6 +190,11 @@ class Character:
 
         self.gold -= amount
 
+    def add_score(self, amount: int):
+        self.score += amount
+
+    def get_score(self) -> int:
+        return self.score
 
 class CharacterDeathException(BaseException):
     """

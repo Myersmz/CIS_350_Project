@@ -255,6 +255,9 @@ class Gui:
             messagebox.showerror("Error",
                                  message="You cannot go west because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
             return
+        elif not self.floor.room().visited:
+            self.player.score += 5
+            self.floor.room().visited = True
 
         next_room: Room = self.floor.room().adjacentRooms[0]
         if next_room.encounter_type == EncounterTypes.BOSS:
@@ -277,6 +280,9 @@ class Gui:
             messagebox.showerror("Error",
                                  message="You cannot go north because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
             return
+        elif not self.floor.room().visited:
+            self.player.score += 5
+            self.floor.room().visited = True
 
         next_room: Room = self.floor.room().adjacentRooms[1]
         if next_room.encounter_type == EncounterTypes.BOSS:
@@ -299,6 +305,9 @@ class Gui:
             messagebox.showerror("Error",
                                  message="You cannot go east because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
             return
+        elif not self.floor.room().visited:
+            self.player.score += 5
+            self.floor.room().visited = True
 
         next_room: Room = self.floor.room().adjacentRooms[2]
         if next_room.encounter_type == EncounterTypes.BOSS:
@@ -321,6 +330,9 @@ class Gui:
             messagebox.showerror("Error",
                                  message="You cannot go south because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
             return
+        elif not self.floor.room().visited:
+            self.player.score += 5
+            self.floor.room().visited = True
 
         next_room: Room = self.floor.room().adjacentRooms[3]
         if next_room.encounter_type == EncounterTypes.BOSS:
@@ -464,7 +476,8 @@ class Gui:
 
     def end_game(self):
         self.game_started = False
-        messagebox.showerror("Game over", message='\nYour journey has ended.')
+        end_score = str(self.player.get_score())
+        messagebox.showerror("Game over", message='\nYour journey has ended.\n Your final score was: ' + end_score)
         self.screen_game.destroy()
         self.start_menu_screen()
 
@@ -575,6 +588,8 @@ class Gui:
                                     message=f'You have defeated the {monster.name}!\n{E.args[0]}')
                 self.fight_in_progress = False
                 self.current_enemy = None
+                if monster.name != "Door":
+                    self.player.score += 10
 
                 # Check for door
                 if monster.name == "Door":

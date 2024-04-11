@@ -41,6 +41,10 @@ class Game:
                                 print('There is no room west of this room.\n')
                             elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
                                 print("You cannot go west because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
+                            elif not self.currentRoom.visited:
+                                self.player.score += 5
+                                self.currentRoom.visited = True
+                                self.currentRoom = self.currentRoom.adjacentRooms[0]
                             else:
                                 self.currentRoom = self.currentRoom.adjacentRooms[0]
                         case "north":
@@ -48,6 +52,10 @@ class Game:
                                 print('There is no room north of this room.\n')
                             elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
                                 print("You cannot go north because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
+                            elif not self.currentRoom.visited:
+                                self.player.score += 5
+                                self.currentRoom.visited = True
+                                self.currentRoom = self.currentRoom.adjacentRooms[1]
                             else:
                                 self.currentRoom = self.currentRoom.adjacentRooms[1]
                         case "east":
@@ -55,6 +63,10 @@ class Game:
                                 print('There is no room east of this room.\n')
                             elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
                                 print("You cannot go east because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
+                            elif not self.currentRoom.visited:
+                                self.player.score += 5
+                                self.currentRoom.visited = True
+                                self.currentRoom = self.currentRoom.adjacentRooms[2]
                             else:
                                 self.currentRoom = self.currentRoom.adjacentRooms[2]
                         case "south":
@@ -62,6 +74,10 @@ class Game:
                                 print('There is no room south of this room.\n')
                             elif self.currentRoom.encounter.encounter_type == EncounterTypes.TRAP and not self.currentRoom.encounter.is_empty:
                                 print("You cannot go south because the doors to this room have shut, the doors look breakable with a sturdy hit or two")
+                            elif not self.currentRoom.visited:
+                                self.player.score += 5
+                                self.currentRoom.visited = True
+                                self.currentRoom = self.currentRoom.adjacentRooms[3]
                             else:
                                 self.currentRoom = self.currentRoom.adjacentRooms[3]
                         case _:
