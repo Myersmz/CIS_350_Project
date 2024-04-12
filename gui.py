@@ -415,31 +415,31 @@ class Gui:
 
     def shop_window(self):
         # Create a new window for the shop
-        shop_window = tk.Toplevel(self.screen_game)
-        shop_window.title("Shop")
+        self.shop_window_var = tk.Toplevel(self.screen_game)
+        self.shop_window_var.title("Shop")
 
         # Display shop message
-        shop_label = tk.Label(shop_window, text="Welcome to the shop.")
+        shop_label = tk.Label(self.shop_window_var, text="Welcome to the shop.")
         shop_label.pack()
 
         # Display shop inventory
-        shop_inventory_text = tk.Label(shop_window, text=self.floor.room().encounter.shop_encounter.display_shop_inventory())
+        shop_inventory_text = tk.Label(self.shop_window_var, text=self.floor.room().encounter.shop_encounter.display_shop_inventory())
         shop_inventory_text.pack()
 
         # Dropdown for item selection
         item_options = self.floor.room().encounter.shop_encounter.display_items()
-        selected_item = tk.StringVar(shop_window)
+        selected_item = tk.StringVar(self.shop_window_var)
         selected_item.set(item_options[0])
 
-        item_dropdown = tk.OptionMenu(shop_window, selected_item, *item_options)
+        item_dropdown = tk.OptionMenu(self.shop_window_var, selected_item, *item_options)
         item_dropdown.pack()
 
         # Dropdown for quantity selection
         quantity_options = [str(i) for i in range(1, 11)]
-        selected_quantity = tk.StringVar(shop_window)
+        selected_quantity = tk.StringVar(self.shop_window_var)
         selected_quantity.set(quantity_options[0])
 
-        quantity_dropdown = tk.OptionMenu(shop_window, selected_quantity, *quantity_options)
+        quantity_dropdown = tk.OptionMenu(self.shop_window_var, selected_quantity, *quantity_options)
         quantity_dropdown.pack()
         
         def buy_items():
@@ -467,11 +467,11 @@ class Gui:
             messagebox.showinfo("Success", f"You purchased {quantity} {selected_item_name}(s).")
             # Create button to buy items
             
-        buy_button = tk.Button(shop_window, text="Buy", command=buy_items)
+        buy_button = tk.Button(self.shop_window_var, text="Buy", command=buy_items)
         buy_button.pack()
 
         # Create button to exit the shop
-        exit_button = tk.Button(shop_window, text="Exit", command=shop_window.destroy)
+        exit_button = tk.Button(self.shop_window_var, text="Exit", command=self.shop_window_var.destroy)
         exit_button.pack()
 
     def end_game(self):
@@ -492,6 +492,12 @@ class Gui:
         '''
         This function is for entering the room and updates the labels of the game screen
         '''
+        if self.floor.room().encounter.encounter_type != EncounterTypes.SHOP:
+            try:
+                self.shop_window_var.destroy()
+            except:
+                pass # this just prevents error for closing the shop window
+
         if self.floor.room().encounter.is_empty:
             self.update_room('You encounter an empty room')
         elif self.floor.room().encounter.encounter_type == EncounterTypes.BOSS:
@@ -504,14 +510,14 @@ class Gui:
             if self.floor.room().encounter.is_empty:
                 self.update_room("The trap has been cleared")
             else:
-                self.label.configure(text=f'The doors have quickly shut, trapping you in the room.\n' +
+                self.update_room(f'The doors have quickly shut, trapping you in the room.\n' +
                                       f'You see a puzzle that seems to be connected to the doors\n' +
                                       f'The puzzle could probably open them, but the doors themselves\n' +
                                       f'Also look like they could be broken if you attacked them enough\n' +
                                       f'{self.floor.room().encounter.trap_problem}')
             
         elif self.floor.room().encounter.encounter_type == EncounterTypes.SHOP:
-            self.label.configure(text="You have encountered a mysterious shop.")
+            self.update_room("You have encountered a mysterious shop.")
             self.shop_window()
 
         self.label2.configure(text=f'\nThere are rooms to the {self.floor.room().directions()} of this room\n')
@@ -789,6 +795,8 @@ class Gui:
         self.floor.room().items.append(item)
 
         # update the window
+        self.update_room()
+
         self.inventory_window.destroy()
         self.inventory()
 
