@@ -729,41 +729,96 @@ class Gui:
         use_button = tk.Button(self.inventory_window, text='Use', command=self.use)
         use_button.grid(row=0, column=2, sticky="NESW")
 
+
+        self.inventory_radio = tk.StringVar()
         i=1 # represents the starting row for the first radio button
 
-        # Count item occurrences
-        item_counts = {}
         for item in self.player.inventory:
-            item_counts[item.name] = item_counts.get(item.name, 0) + 1
-
-        # Add radiobuttons for each item name
-        for item_name, count in item_counts.items():
-            display_text = item_name if count == 1 else f"{item_name} x{count}"
-            radio_button= tk.Radiobutton(self.inventory_window, text = display_text, value = item_name)
+            attribute_name = ""
+            
+            match item.type:
+                case ItemTypes.MELEE, ItemTypes.RANGED, ItemTypes.SPELLBOOK, ItemTypes.STAFF:
+                    attribute_name = " attack"
+                case ItemTypes.SHIELD, ItemTypes.ARMOUR:
+                    attribute_name = " defense"
+                case default:
+                    pass
+            
+            radio_button= tk.Radiobutton(self.inventory_window, text=f"{item.name}: {item.attributeValue}{attribute_name}", value=item.__str__(), variable=self.inventory_radio)
             radio_button.grid(row=i, column=0, columnspan=3, sticky="NESW")
             i+=1
-
+            
         # setting up the window
         self.inventory_window.grid_rowconfigure(list(range(i)), weight=1)
         self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
 
-    def drop(self, item):
+
+            #Old Way
+            #i=1 # represents the starting row for the first radio button
+
+            # Count item occurrences
+            #item_counts = {}
+            #for item in self.player.inventory:
+            #    item_counts[item.name] = item_counts.get(item.name, 0) + 1
+
+            # Add radiobuttons for each item name
+            #for item_name, count in item_counts.items():
+            #    display_text = item_name if count == 1 else f"{item_name} x{count}"
+            #    radio_button= tk.Radiobutton(self.inventory_window, text = display_text, value = item_name, variable=self.inventory_radio)
+            #    radio_button.grid(row=i, column=0, columnspan=3, sticky="NESW")
+            #    i+=1
+
+            # setting up the window
+            #self.inventory_window.grid_rowconfigure(list(range(i)), weight=1)
+            #self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
+
+    def drop(self):
+        
+        item_str = self.inventory_radio.get()
+
+        item = None
+
+        for items in self.player.inventory:
+            if items.__str__() == item_str:
+                item = items
+
         if item not in self.player.inventory:
             raise ValueError("Item does not exist in the inventory.")
 
         self.player.inventory.remove(item)
         self.floor.room().items.append(item)
+
+        # update the window
+        self.inventory_window.destroy()
         self.inventory()
 
-    def equip(self, item):
+    def equip(self):
+        item_str = self.inventory_radio.get()
+
+        item = None
+
+        for items in self.player.inventory:
+            if items.__str__() == item_str:
+                item = items
+
         try:
             self.player.equip_from_inventory(item)
         except:
             pass
 
+        # update the window
+        self.inventory_window.destroy()
         self.inventory()
 
-    def use(self, item):
+    def use(self):
+        item_str = self.inventory_radio.get()
+
+        item = None
+
+        for items in self.player.inventory:
+            if items.__str__() == item_str:
+                item = items
+
         if item.type not in [ItemTypes.SHOP, ItemTypes.POTION, ItemTypes.ITEM]:
             return
 
@@ -838,6 +893,10 @@ class Gui:
             message = "I don't know how to use that item.."
 
         messagebox.showinfo('Use item', message=message)
+
+        # update the window
+        self.inventory_window.destroy()
+        self.inventory()
 
     def stats(self):
         '''

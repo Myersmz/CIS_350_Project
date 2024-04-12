@@ -105,11 +105,20 @@ class Character:
         print("Current Score: ", self.score)
 
     def get_character_info(self):
+
+        # update the stats to match the equiped items
+        defense = self.base_defense
+        defense += self.equipped_shield.get_attribute()
+        defense += self.equipped_armour.get_attribute()
+
+        attack = self.base_attack
+        attack += self.equipped_weapon.get_attribute()
+
         return f"Character Name: {self.name}\n" \
                f"------~=====+=====~------\n" \
                f"Character Health: {self.health}\n" \
-               f"Character Attack: {self.base_attack}\n" \
-               f"Character Defense: {self.base_defense}\n" \
+               f"Character Attack: {attack}\n" \
+               f"Character Defense: {defense}\n" \
                f"Gold: {self.gold}\n" \
                f"Current Score: {self.score}"
 
