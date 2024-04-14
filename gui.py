@@ -19,6 +19,7 @@ class Gui:
         self.game_started = False
         self.dungeonSize = 14
         self.room_text = ""
+        self.active_item = None
 
         # Battle Vars
         self.fight_in_progress = False
@@ -586,8 +587,15 @@ class Gui:
         monster_stats = tk.Label(fight_window, text="")
         monster_stats.grid(row=1, columnspan=3, sticky="NESW")
 
+        self.player.next_attack = None
+        self.player.next_defense = None
         self.player.get_defense()
         self.player.get_attack()
+
+        self.current_enemy.next_attack = None
+        self.current_enemy.next_defense = None
+        self.current_enemy.get_defense()
+        self.current_enemy.get_attack()
 
         def throw_attack():
             turn_dialogue = ""
@@ -733,6 +741,11 @@ class Gui:
         self.inventory_window.minsize(400,300)
         self.inventory_window.title("Inventory Menu")
 
+        self.active_item = None
+
+        def set_active(x):
+            self.active_item = x
+
         # adding the buttons
         drop_button = tk.Button(self.inventory_window, text='Drop', command=self.drop)
         drop_button.grid(row=0, column=0, sticky="NESW")
@@ -756,7 +769,8 @@ class Gui:
                 case default:
                     pass
 
-            radio_button= tk.Radiobutton(self.inventory_window, text=f"{item.name}: {item.attributeValue}{attribute_name}", value=item.__str__(), variable=self.inventory_radio)
+            radio_button= tk.Radiobutton(self.inventory_window, text=f"{item.name}: {item.attributeValue}{attribute_name}",
+                                         value=item.__str__(), variable=self.inventory_radio, command=lambda x=item: set_active(x))
             radio_button.grid(row=i, column=0, columnspan=3, sticky="NESW")
             i+=1
 
@@ -768,7 +782,7 @@ class Gui:
             #Old Way
             #i=1 # represents the starting row for the first radio button
 
-            # Count item occurrences
+            # Count item occurrences`
             #item_counts = {}
             #for item in self.player.inventory:
             #    item_counts[item.name] = item_counts.get(item.name, 0) + 1
@@ -785,17 +799,11 @@ class Gui:
             #self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
 
     def drop(self):
-
-        item_str = self.inventory_radio.get()
-
-        item = None
-
-        for items in self.player.inventory:
-            if items.__str__() == item_str:
-                item = items
+        item = self.active_item
 
         if item not in self.player.inventory:
-            raise ValueError("Item does not exist in the inventory.")
+            return
+        self.active_item = None
 
         self.player.inventory.remove(item)
         self.floor.room().items.append(item)
@@ -807,13 +815,11 @@ class Gui:
         self.inventory()
 
     def equip(self):
-        item_str = self.inventory_radio.get()
+        item = self.active_item
 
-        item = None
-
-        for items in self.player.inventory:
-            if items.__str__() == item_str:
-                item = items
+        if item not in self.player.inventory:
+            return
+        self.active_item = None
 
         try:
             self.player.equip_from_inventory(item)
@@ -825,16 +831,15 @@ class Gui:
         self.inventory()
 
     def use(self):
-        item_str = self.inventory_radio.get()
+        item = self.active_item
 
-        item = None
-
-        for items in self.player.inventory:
-            if items.__str__() == item_str:
-                item = items
+        if item is None:
+            return
 
         if item.type not in [ItemTypes.SHOP, ItemTypes.POTION, ItemTypes.ITEM]:
             return
+
+        self.active_item = None
 
         message = ""
 
@@ -852,6 +857,8 @@ class Gui:
                 attribute = pow(item.attributeValue + item.item_buff, -1)
                 debuff = Statistic("Weakness", multiplier=attribute, duration=3)
                 self.current_enemy.multipliers["attack"].append(debuff)
+                self.current_enemy.next_attack = None
+                self.current_enemy.get_attack()
                 message = f"Applied weakness"
 
         elif item.name == "Crude Poison Potion":
@@ -862,6 +869,8 @@ class Gui:
                 attribute = pow(item.attributeValue + item.item_buff, -1)
                 debuff = Statistic("Poison", multiplier=attribute, duration=3)
                 self.current_enemy.multipliers["defense"].append(debuff)
+                self.current_enemy.next_defense = None
+                self.current_enemy.get_defense()
                 message = f"Applied poison"
 
         elif item.name == "Pineapple Pizza":
@@ -875,6 +884,8 @@ class Gui:
             buff = Statistic("Defense Buff", multiplier=attribute, duration=5)
             self.player.multipliers["defense"].append(buff)
             self.player.inventory.remove(item)
+            self.player.next_defense = None
+            self.player.get_defense()
             message = "Applied defense buff"
 
         elif item.name == "Attack Potion":
@@ -882,6 +893,8 @@ class Gui:
             buff = Statistic("Attack Buff", multiplier=attribute, duration=5)
             self.player.multipliers["attack"].append(buff)
             self.player.inventory.remove(item)
+            self.player.next_attack = None
+            self.player.get_attack()
             message = "Applied attack buff"
 
         elif item.name == "Weakness Potion":
@@ -892,6 +905,8 @@ class Gui:
                 attribute = pow(item.attributeValue + item.item_buff, -1)
                 debuff = Statistic("Weakness", multiplier=attribute, duration=5)
                 self.current_enemy.multipliers["attack"].append(debuff)
+                self.current_enemy.next_attack = None
+                self.current_enemy.get_attack()
                 message = f"Applied weakness"
 
         elif item.name == "Poison Potion":
@@ -902,6 +917,8 @@ class Gui:
                 attribute = pow(item.attributeValue + item.item_buff, -1)
                 debuff = Statistic("Poison", multiplier=attribute, duration=5)
                 self.current_enemy.multipliers["defense"].append(debuff)
+                self.current_enemy.next_defense = None
+                self.current_enemy.get_defense()
                 message = f"Applied poison"
         else:
             message = "I don't know how to use that item.."
@@ -951,6 +968,7 @@ class Gui:
         button_return.grid(row=3, sticky="NESW")
 
     def descend(self):
+        self.floor.cleared_floors += 1
         self.floor.generate_new_floor()
         self.enterRoom()
 
