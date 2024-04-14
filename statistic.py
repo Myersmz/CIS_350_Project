@@ -37,7 +37,7 @@ class Statistic:
             for stat in multipliers.get(stat_type):
                 mult *= stat.multiplier
 
-        if is_item:
+        if is_item or ext_multipliers == {}:
             return mult
 
         for stat in ext_multipliers.get(stat_type):

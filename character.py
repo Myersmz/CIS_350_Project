@@ -235,6 +235,8 @@ def get_monster() -> Character:
     else:
         monster_defense = defense
 
+    monster_health = int(monster_health * Statistic.get_multiplier(stat_type="health", is_monster=True))
+
     new_monster = Character(monster.get("name"), health=monster_health, attack=monster_attack, defense=monster_defense)
 
     gold_value = random.randint(0, 20)
@@ -263,6 +265,8 @@ def get_boss():
         boss_defense = random.randint(defense[0], defense[1])
     else:
         boss_defense = defense
+
+    boss_health = int(boss_health * Statistic.get_multiplier(stat_type="health", is_monster=True))
 
     new_boss = Character(boss.get("name"), health=boss_health, attack=boss_attack, defense=boss_defense)
 
