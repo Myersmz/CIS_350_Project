@@ -8,6 +8,8 @@
     {"name": "Ghoul", "health":  [8, 28], "attack": [4, 6], "defense": [1, 8]}
   ],
   "boss": [
-    {"name": "Dragon", "health":  [3, 4], "attack": [1, 2], "defense": [1, 1]}
+    {"name": "Dragon", "health":  [30, 46], "attack": [10, 16], "defense": [5, 12]},
+    {"name": "King Slime", "health":  [28, 40], "attack": [6, 14], "defense": [4, 8]},
+    {"name": "Demon", "health":  [38, 50], "attack": [12, 20], "defense": [16, 24]}
   ]
 }

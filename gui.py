@@ -18,6 +18,7 @@ class Gui:
         self.floor = None
         self.game_started = False
         self.dungeonSize = 14
+        self.room_text = ""
 
         # Battle Vars
         self.fight_in_progress = False
@@ -481,7 +482,12 @@ class Gui:
         self.screen_game.destroy()
         self.start_menu_screen()
 
-    def update_room(self, label_text=""):
+    def update_room(self, label_text=None):
+        if label_text is not None:
+            self.room_text = label_text
+        else:
+            label_text = self.room_text
+
         if len((mons := self.floor.room().monsters)) != 0:
             label_text += f'\nMonsters: ' + ', '.join([x.name for x in mons])
         if len((_items := self.floor.room().items)) != 0:
@@ -511,11 +517,11 @@ class Gui:
                 self.update_room("The trap has been cleared")
             else:
                 self.update_room(f'The doors have quickly shut, trapping you in the room.\n' +
-                                      f'You see a puzzle that seems to be connected to the doors\n' +
-                                      f'The puzzle could probably open them, but the doors themselves\n' +
-                                      f'Also look like they could be broken if you attacked them enough\n' +
-                                      f'{self.floor.room().encounter.trap_problem}')
-            
+                                  f'You see a puzzle that seems to be connected to the doors\n' +
+                                  f'The puzzle could probably open them, but the doors themselves\n' +
+                                  f'Also look like they could be broken if you attacked them enough\n' +
+                                  f'{self.floor.room().encounter.trap_problem}')
+
         elif self.floor.room().encounter.encounter_type == EncounterTypes.SHOP:
             self.update_room("You have encountered a mysterious shop.")
             self.shop_window()
@@ -741,7 +747,7 @@ class Gui:
 
         for item in self.player.inventory:
             attribute_name = ""
-            
+
             match item.type:
                 case ItemTypes.MELEE, ItemTypes.RANGED, ItemTypes.SPELLBOOK, ItemTypes.STAFF:
                     attribute_name = " attack"
@@ -749,11 +755,11 @@ class Gui:
                     attribute_name = " defense"
                 case default:
                     pass
-            
+
             radio_button= tk.Radiobutton(self.inventory_window, text=f"{item.name}: {item.attributeValue}{attribute_name}", value=item.__str__(), variable=self.inventory_radio)
             radio_button.grid(row=i, column=0, columnspan=3, sticky="NESW")
             i+=1
-            
+
         # setting up the window
         self.inventory_window.grid_rowconfigure(list(range(i)), weight=1)
         self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
@@ -779,7 +785,7 @@ class Gui:
             #self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
 
     def drop(self):
-        
+
         item_str = self.inventory_radio.get()
 
         item = None
