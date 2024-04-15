@@ -1,5 +1,5 @@
 import unittest
-from Room import *
+from room import *
 
 class MyTestCase(unittest.TestCase):
 
@@ -13,6 +13,58 @@ class MyTestCase(unittest.TestCase):
         self.assertIsNone(room.adjacentRooms[1])
         self.assertIsNone(room.adjacentRooms[2])
         self.assertIsNone(room.adjacentRooms[3])
+
+    def test_default_args(self):
+        item = Item()
+        room = Room("This room", position=[10, 0], item_list=[item])
+
+        self.assertEqual(room.name, "This room")
+        self.assertEqual(room.items[0], item)
+        self.assertEqual(room.position, [10, 0])
+        self.assertIsNone(room.adjacentRooms[0])
+        self.assertIsNone(room.adjacentRooms[1])
+        self.assertIsNone(room.adjacentRooms[2])
+        self.assertIsNone(room.adjacentRooms[3])
+
+    def test_default_initiate(self):
+        room = Room("This room")
+        room.initiate()
+
+        self.assertNotEqual(room.encounter, None)
+
+    def test_generate_monster_invalid(self):
+        room = Room("This room", encounter_type=EncounterTypes.SHOP)
+        room.initiate()
+
+        self.assertEqual(room.monsters, [])
+
+    def test_generate_items(self):
+        room = Room("This room")
+
+        while room.items == []:
+            room.generate_items()
+
+        self.assertNotEqual(room.items, [])
+
+    def test_remove_items(self):
+        room = Room("This room")
+
+        while room.items == []:
+            room.generate_items()
+
+        item = room.items[0]
+        room.remove_item(item)
+        self.assertFalse(item in room.items)
+
+    def test_remove_items_invalid(self):
+        room = Room("This room")
+
+        while room.items == []:
+            room.generate_items()
+
+        item = Item()
+        item.generateItem()
+        self.assertRaises(ValueError, room.remove_item, item)
 
     def test_direction(self):
         room = Room("This room")
@@ -45,6 +97,15 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(room2.position, [0,-1])
         self.assertEqual(room2.adjacentRooms[3], room)
         self.assertEqual(room.adjacentRooms[1], room2)
+
+    def test_assignRoom_valid2(self):
+        room = Room("This room")
+        room2 = Room("That room")
+        room.assignRoom(room2, 3)
+
+        self.assertEqual(room2.position, [0,1])
+        self.assertEqual(room2.adjacentRooms[1], room)
+        self.assertEqual(room.adjacentRooms[3], room2)
 
     def test_is_dead_end_invalidDirection(self):
         room = Room("This room")

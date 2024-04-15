@@ -8,7 +8,9 @@ class Room:
     This is the class for representing and storing information about the room. The rooms work similar to a linked list with adjacent rooms holding what rooms
     there are for being adjacent. Uses the encounter class to make the type of room. Uses the item class for any items dropped in the room.
     """
-    def __init__(self, name, left=None, up=None, right=None, down=None, item_list=None, position=None, encounter_type=None):
+
+    def __init__(self, name, left=None, up=None, right=None, down=None, item_list=None, position=None,
+                 encounter_type=None):
         if position is None:
             position = [0, 0]
         self.position = position
@@ -47,7 +49,7 @@ class Room:
 
         for i in range(count):
             new_item = Item()
-            new_item_type = ItemTypes(random.randint(0, max_item_types-1))
+            new_item_type = ItemTypes(random.randint(0, max_item_types - 1))
             new_item.generateItem(new_item_type)
             self.items.append(new_item)
 
@@ -57,10 +59,10 @@ class Room:
         """
         if not isinstance(room, Room):
             raise TypeError("Not a valid room")
-        
+
         if not isinstance(direction, int):
             raise TypeError("direction should be an int")
-        
+
         if direction < 0 or direction > 3:
             raise ValueError("Invalid direction value")
 
@@ -74,14 +76,14 @@ class Room:
             pointerY += -1
         elif direction == 2:
             pointerX += 1
-        elif direction == 3:
+        else:  # direction == 3
             pointerY += 1
         room.position = [self.position[0] + pointerX, self.position[1] + pointerY]
 
         room.adjacentRooms[(direction + 2) % 4] = self
 
     # 0 is West, 1 is North, 2 is East, 3 is South
-    def is_dead_end(self, direction:int):
+    def is_dead_end(self, direction: int):
         """
         This function is for returning if a direction of the room is a dead end or not.
         """
@@ -109,7 +111,7 @@ class Room:
     #           self.items.remove(i)
     #          return i
 
-    #def add_item(self, item: Item):
+    # def add_item(self, item: Item):
     #     """
     #     This function is for adding an item to a room will be used in future release.
     #     """
@@ -126,12 +128,13 @@ class Room:
         if item not in self.items:
             raise ValueError("This item is not in the inventory.")
 
-        for i in range(len(self.items)):
-            if self.items[i] == item:
-                self.items.pop(i)
-                return
-        raise OverflowError("Could not locate the item in the inventory.")
-         
+        self.items.remove(item)
+        # for i in range(len(self.items)):
+        #     if self.items[i] == item:
+        #         self.items.pop(i)
+        #         return
+        # raise ValueError("Could not locate the item in the inventory.")
+
     def directions(self):
         """
         This function returns a string with the direction of adjacent rooms to be printed to the console.
@@ -150,5 +153,5 @@ class Room:
             if self.adjacentRooms[3]:
                 direction_string += ', '
         if self.adjacentRooms[3]:
-            direction_string += 'South'    
+            direction_string += 'South'
         return direction_string
