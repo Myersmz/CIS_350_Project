@@ -134,6 +134,22 @@ class MyTestCase(unittest.TestCase):
         expectedString = f"--~= {item.name} =~--\n{item.description}\n"
         self.assertEqual(item.display(), expectedString)
 
+    def test_get_attribute_static(self):
+        item = Item()
+        item.generateItem()
+        item.attributeValue = 10
+
+        self.assertEqual(item.get_attribute(), 10)
+
+    def test_get_attribute_range(self):
+        item = Item()
+        item.generateItem()
+        item.attributeValue = [10, 20]
+
+        self.assertGreaterEqual(item.get_attribute(), 10)
+        self.assertLessEqual(item.get_attribute(), 20)
+
+
     def test_str_cast(self):
         item = Item()
         item.generateItem(ItemTypes.ITEM)
