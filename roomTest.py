@@ -1,14 +1,15 @@
 import unittest
 from room import *
 
-class MyTestCase(unittest.TestCase):
+
+class RoomTest(unittest.TestCase):
 
     def test_default(self):
         room = Room("This room")
 
         self.assertEqual(room.name, "This room")
         self.assertIsInstance(room.items, list)
-        self.assertEqual(room.position, [0,0])
+        self.assertEqual(room.position, [0, 0])
         self.assertIsNone(room.adjacentRooms[0])
         self.assertIsNone(room.adjacentRooms[1])
         self.assertIsNone(room.adjacentRooms[2])
@@ -68,7 +69,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_direction(self):
         room = Room("This room")
-        room2 = Room("That room", left = room)
+        room2 = Room("That room", left=room)
         self.assertEqual(room2.adjacentRooms[0], room)
 
     def test_assignRoom_invalidRoom(self):
@@ -76,7 +77,7 @@ class MyTestCase(unittest.TestCase):
         badRoom = "room"
         with self.assertRaises(TypeError):
             room.assignRoom(badRoom, 1)
-   
+
     def test_assignRoom_invalidDirection(self):
         room = Room("This room")
         room2 = Room("That room")
@@ -88,13 +89,13 @@ class MyTestCase(unittest.TestCase):
             room.assignRoom(room2, -1)
         with self.assertRaises(ValueError):
             room.assignRoom(room2, 4)
-    
+
     def test_assignRoom_valid(self):
         room = Room("This room")
         room2 = Room("That room")
         room.assignRoom(room2, 1)
 
-        self.assertEqual(room2.position, [0,-1])
+        self.assertEqual(room2.position, [0, -1])
         self.assertEqual(room2.adjacentRooms[3], room)
         self.assertEqual(room.adjacentRooms[1], room2)
 
@@ -103,7 +104,7 @@ class MyTestCase(unittest.TestCase):
         room2 = Room("That room")
         room.assignRoom(room2, 3)
 
-        self.assertEqual(room2.position, [0,1])
+        self.assertEqual(room2.position, [0, 1])
         self.assertEqual(room2.adjacentRooms[1], room)
         self.assertEqual(room.adjacentRooms[3], room2)
 

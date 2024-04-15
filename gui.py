@@ -968,7 +968,6 @@ class Gui:
         button_return.grid(row=3, sticky="NESW")
 
     def descend(self):
-        self.floor.cleared_floors += 1
         self.floor.generate_new_floor()
         self.enterRoom()
 

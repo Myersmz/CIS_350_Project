@@ -10,6 +10,7 @@ class Floor:
         self.current_room = self.generate_floor()
 
     def generate_new_floor(self):
+        self.cleared_floors += 1
         self.increase_difficulty()
         self.current_room = self.generate_floor()
 
@@ -53,6 +54,9 @@ class Floor:
         """
         if room_count is None:
             room_count = self.dungeon_size
+
+        if room_count < 3:
+            raise ValueError("Must be three or larger")
 
         entrance = Room("Floor Entrance")
         entrance.encounter_type = EncounterTypes.EMPTY
