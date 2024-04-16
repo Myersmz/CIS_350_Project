@@ -20,6 +20,7 @@ class Character:
 
         self.name = name
         self.is_player = False
+        self.is_boss = False
 
         self.health = health
         self.base_attack = attack
@@ -49,6 +50,13 @@ class Character:
         """
         self.is_player = True
         self.equipped_weapon: Item = Item("Hands", "", item_type=ItemTypes.MELEE, attribute_value=3)
+
+    def assign_boss(self):
+        """
+        Sets a flag to allow slightly different functionality of player vs monster.
+        :return:
+        """
+        self.is_boss = True
 
     def start_next_turn(self):
         self.next_attack = None
@@ -272,6 +280,7 @@ def get_boss():
     boss_health = int(boss_health * Statistic.get_multiplier(stat_type="health", is_monster=True))
 
     new_boss = Character(boss.get("name"), health=boss_health, attack=boss_attack, defense=boss_defense)
+    new_boss.assign_boss()
 
     gold_value = random.randint(40, 200)
     if gold_value != 0:

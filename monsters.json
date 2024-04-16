@@ -1,15 +1,15 @@
 {
   "monster": [
-    {"name": "Slime", "health":  [4, 12], "attack": [0, 3], "defense": 0},
-    {"name": "Goblin", "health":  [8, 24], "attack": [2, 6], "defense": [1, 5]},
-    {"name": "Demon", "health":  [8, 28], "attack": [2, 8], "defense": [3, 6]},
-    {"name": "Phantom", "health":  [4, 16], "attack": [2, 6], "defense": 0},
-    {"name": "Spider", "health":  [8, 24], "attack": [2, 6], "defense": [0, 4]},
-    {"name": "Ghoul", "health":  [8, 28], "attack": [4, 6], "defense": [1, 8]}
+    {"name": "Slime", "health":  [4, 12], "attack": [2, 6], "defense": 0},
+    {"name": "Goblin", "health":  [8, 24], "attack": [3, 6], "defense": [1, 5]},
+    {"name": "Demon", "health":  [8, 28], "attack": [6, 10], "defense": [3, 6]},
+    {"name": "Phantom", "health":  [4, 16], "attack": [6, 10], "defense": 0},
+    {"name": "Spider", "health":  [8, 24], "attack": [4, 7], "defense": [0, 4]},
+    {"name": "Ghoul", "health":  [8, 28], "attack": [8, 12], "defense": [1, 8]}
   ],
   "boss": [
     {"name": "Dragon", "health":  [30, 46], "attack": [10, 16], "defense": [5, 12]},
     {"name": "King Slime", "health":  [28, 40], "attack": [6, 14], "defense": [4, 8]},
-    {"name": "Demon", "health":  [38, 50], "attack": [12, 20], "defense": [16, 24]}
+    {"name": "Demon", "health":  [38, 50], "attack": [12, 14], "defense": [8, 12]}
   ]
 }
