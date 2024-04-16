@@ -1,8 +1,0 @@
-{
-  "MELEE": [
-    {"NAME": "Hero's Sword", "DESCRIPTION": "Why is this here?", "ATTRIBUTE": 12, "RARITY":  20}
-  ],
-  "SHIELD": [
-    {"NAME": "Hero's Shield", "DESCRIPTION": "What happened to the hero?", "ATTRIBUTE": 15, "RARITY": 20}
-  ]
-}

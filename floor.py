@@ -99,9 +99,20 @@ class Floor:
                 if rm is not None and rm != parent_room:
                     rm.assignRoom(new_room, 1)
 
-        # Assign required EncounterTypes to a random room.
         other_rooms = [rooms.pop(0)]  # removes the entrance for the list because we want it to be empty.
-        for i in range(100, max_single_rooms + 1):
+
+        # Add boss room to a room with the least connections
+        rooms.sort(key=lambda room: len([x for x in room.adjacentRooms if x is not None]))
+        min_connections = len([x for x in rooms[0].adjacentRooms if x is not None])
+        leaf_rooms = [x for x in rooms if len([x for x in rooms[0].adjacentRooms if x is not None]) == min_connections]
+        position = random.randint(0, len(leaf_rooms) - 1)
+        leaf_rooms[position].encounter_type = EncounterTypes(100)
+        boss_room = leaf_rooms.pop(position)
+        other_rooms.append(boss_room)
+        rooms.remove(boss_room)
+
+        # Assign other required EncounterTypes to a random room.
+        for i in range(101, max_single_rooms + 1):
             position = random.randint(0, len(rooms) - 1)
             rooms[position].encounter_type = EncounterTypes(i)
             other_rooms.append(rooms.pop(position))

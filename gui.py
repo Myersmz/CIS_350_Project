@@ -530,6 +530,9 @@ class Gui:
         self.label2.configure(text=f'\nThere are rooms to the {self.floor.room().directions()} of this room\n')
 
     def stage_attack(self):
+        if self.fight_in_progress:
+            return
+
         if self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
                 and not self.floor.room().encounter.is_empty:
             # try:
@@ -683,7 +686,7 @@ class Gui:
             return
 
         self.item_pickup_menu = tk.Toplevel()
-        self.item_pickup_menu.geometry("200x400")
+        self.item_pickup_menu.geometry("200x250")
         self.item_pickup_menu.title("Pickup")
 
         label = tk.Label(self.item_pickup_menu, text="Pickup what?")
@@ -824,6 +827,7 @@ class Gui:
         try:
             self.player.equip_from_inventory(item)
         except:
+            messagebox.showinfo('Success', message=f'Cannot equip that item.')
             pass
 
         # update the window
@@ -837,6 +841,7 @@ class Gui:
             return
 
         if item.type not in [ItemTypes.SHOP, ItemTypes.POTION, ItemTypes.ITEM]:
+            messagebox.showinfo('Success', message=f"Can't use that item.")
             return
 
         self.active_item = None
