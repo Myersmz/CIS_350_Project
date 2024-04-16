@@ -15,6 +15,9 @@ class Character:
     """
 
     def __init__(self, name, health, attack, defense):
+        if health <= 0 or attack < 0 or defense < 0:
+            raise ValueError("Invalid argument")
+
         self.name = name
         self.is_player = False
 
@@ -92,17 +95,17 @@ class Character:
         else:
             raise ValueError("Item is not equippable")
 
-        if old_item.name != "None":
+        if old_item.name not in ["None", "Hands"]:
             self.inventory.append(old_item)
 
-    # Prints character information
-    def print_character_info(self):
-        print("Character Name:", self.name)
-        print("Character Health:", self.health)
-        print("Character Attack:", self.base_attack)
-        print("Character Defense:", self.base_defense)
-        print("Character Inventory:", self.inventory)
-        print("Current Score: ", self.score)
+    # # Prints character information
+    # def print_character_info(self):
+    #     print("Character Name:", self.name)
+    #     print("Character Health:", self.health)
+    #     print("Character Attack:", self.base_attack)
+    #     print("Character Defense:", self.base_defense)
+    #     print("Character Inventory:", self.inventory)
+    #     print("Current Score: ", self.score)
 
     def get_character_info(self):
 
@@ -275,20 +278,3 @@ def get_boss():
         new_boss.inventory.append(Item("Gold", description="Used to buy items at the shop",
                                        attribute_value=gold_value))
     return new_boss
-
-# if __name__ == "__main__":
-#     # Test code
-#     test = Character("test", 10, 10, 10)
-#     test.equipped_shield = Item("Iron Shield", "debug", attribute_value=[-4, 10], item_type=ItemTypes.SHIELD)
-#     # # test.equipped_shield = Item("Iron Shield", "debug", attribute_value=6, item_type=ItemTypes.SHIELD)
-#     # test.multipliers["defense"].append(Stat(multiplier=2))
-#     # test.multipliers["defense"].append(Stat("Slow", multiplier=0.7))
-#
-#     mon = Character("Cursed Seal", 14, 6, 7)
-#     mon.equipped_weapon = Item("Flipper", "", attribute_value=[2, 8], item_type=ItemTypes.MELEE)
-#     mon.multipliers["attack"].append(Stat("Enraged", multiplier=5))
-#
-#     test.print_character_info()
-#     test.get_attacked(mon)
-#     test.print_character_info()
-#     # print(test.calc_defense())
