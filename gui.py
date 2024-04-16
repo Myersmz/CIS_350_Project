@@ -18,8 +18,6 @@ class Gui:
         self.floor = None
         self.game_started = False
         self.dungeonSize = 14
-        self.room_text = ""
-        self.active_item = None
 
         # Battle Vars
         self.fight_in_progress = False
@@ -417,31 +415,31 @@ class Gui:
 
     def shop_window(self):
         # Create a new window for the shop
-        self.shop_window_var = tk.Toplevel(self.screen_game)
-        self.shop_window_var.title("Shop")
+        shop_window = tk.Toplevel(self.screen_game)
+        shop_window.title("Shop")
 
         # Display shop message
-        shop_label = tk.Label(self.shop_window_var, text="Welcome to the shop.")
+        shop_label = tk.Label(shop_window, text="Welcome to the shop.")
         shop_label.pack()
 
         # Display shop inventory
-        shop_inventory_text = tk.Label(self.shop_window_var, text=self.floor.room().encounter.shop_encounter.display_shop_inventory())
+        shop_inventory_text = tk.Label(shop_window, text=self.floor.room().encounter.shop_encounter.display_shop_inventory())
         shop_inventory_text.pack()
 
         # Dropdown for item selection
         item_options = self.floor.room().encounter.shop_encounter.display_items()
-        selected_item = tk.StringVar(self.shop_window_var)
+        selected_item = tk.StringVar(shop_window)
         selected_item.set(item_options[0])
 
-        item_dropdown = tk.OptionMenu(self.shop_window_var, selected_item, *item_options)
+        item_dropdown = tk.OptionMenu(shop_window, selected_item, *item_options)
         item_dropdown.pack()
 
         # Dropdown for quantity selection
         quantity_options = [str(i) for i in range(1, 11)]
-        selected_quantity = tk.StringVar(self.shop_window_var)
+        selected_quantity = tk.StringVar(shop_window)
         selected_quantity.set(quantity_options[0])
 
-        quantity_dropdown = tk.OptionMenu(self.shop_window_var, selected_quantity, *quantity_options)
+        quantity_dropdown = tk.OptionMenu(shop_window, selected_quantity, *quantity_options)
         quantity_dropdown.pack()
         
         def buy_items():
@@ -469,11 +467,11 @@ class Gui:
             messagebox.showinfo("Success", f"You purchased {quantity} {selected_item_name}(s).")
             # Create button to buy items
             
-        buy_button = tk.Button(self.shop_window_var, text="Buy", command=buy_items)
+        buy_button = tk.Button(shop_window, text="Buy", command=buy_items)
         buy_button.pack()
 
         # Create button to exit the shop
-        exit_button = tk.Button(self.shop_window_var, text="Exit", command=self.shop_window_var.destroy)
+        exit_button = tk.Button(shop_window, text="Exit", command=shop_window.destroy)
         exit_button.pack()
 
     def end_game(self):
@@ -483,12 +481,7 @@ class Gui:
         self.screen_game.destroy()
         self.start_menu_screen()
 
-    def update_room(self, label_text=None):
-        if label_text is not None:
-            self.room_text = label_text
-        else:
-            label_text = self.room_text
-
+    def update_room(self, label_text=""):
         if len((mons := self.floor.room().monsters)) != 0:
             label_text += f'\nMonsters: ' + ', '.join([x.name for x in mons])
         if len((_items := self.floor.room().items)) != 0:
@@ -499,12 +492,6 @@ class Gui:
         '''
         This function is for entering the room and updates the labels of the game screen
         '''
-        if self.floor.room().encounter.encounter_type != EncounterTypes.SHOP:
-            try:
-                self.shop_window_var.destroy()
-            except:
-                pass # this just prevents error for closing the shop window
-
         if self.floor.room().encounter.is_empty:
             self.update_room('You encounter an empty room')
         elif self.floor.room().encounter.encounter_type == EncounterTypes.BOSS:
@@ -517,22 +504,19 @@ class Gui:
             if self.floor.room().encounter.is_empty:
                 self.update_room("The trap has been cleared")
             else:
-                self.update_room(f'The doors have quickly shut, trapping you in the room.\n' +
-                                  f'You see a puzzle that seems to be connected to the doors\n' +
-                                  f'The puzzle could probably open them, but the doors themselves\n' +
-                                  f'Also look like they could be broken if you attacked them enough\n' +
-                                  f'{self.floor.room().encounter.trap_problem}')
-
+                self.label.configure(text=f'The doors have quickly shut, trapping you in the room.\n' +
+                                      f'You see a puzzle that seems to be connected to the doors\n' +
+                                      f'The puzzle could probably open them, but the doors themselves\n' +
+                                      f'Also look like they could be broken if you attacked them enough\n' +
+                                      f'{self.floor.room().encounter.trap_problem}')
+            
         elif self.floor.room().encounter.encounter_type == EncounterTypes.SHOP:
-            self.update_room("You have encountered a mysterious shop.")
+            self.label.configure(text="You have encountered a mysterious shop.")
             self.shop_window()
 
         self.label2.configure(text=f'\nThere are rooms to the {self.floor.room().directions()} of this room\n')
 
     def stage_attack(self):
-        if self.fight_in_progress:
-            return
-
         if self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
                 and not self.floor.room().encounter.is_empty:
             # try:
@@ -590,15 +574,8 @@ class Gui:
         monster_stats = tk.Label(fight_window, text="")
         monster_stats.grid(row=1, columnspan=3, sticky="NESW")
 
-        self.player.next_attack = None
-        self.player.next_defense = None
         self.player.get_defense()
         self.player.get_attack()
-
-        self.current_enemy.next_attack = None
-        self.current_enemy.next_defense = None
-        self.current_enemy.get_defense()
-        self.current_enemy.get_attack()
 
         def throw_attack():
             turn_dialogue = ""
@@ -617,6 +594,7 @@ class Gui:
                 # Check for door
                 if monster.name == "Door":
                     self.floor.room().encounter.is_empty = True
+                    self.enterRoom()
                 elif self.floor.room().encounter.encounter_type == EncounterTypes.BOSS:
                     messagebox.showinfo('Success',
                                         message=f'You descend deeper into the depths')
@@ -686,7 +664,7 @@ class Gui:
             return
 
         self.item_pickup_menu = tk.Toplevel()
-        self.item_pickup_menu.geometry("200x250")
+        self.item_pickup_menu.geometry("200x400")
         self.item_pickup_menu.title("Pickup")
 
         label = tk.Label(self.item_pickup_menu, text="Pickup what?")
@@ -744,11 +722,6 @@ class Gui:
         self.inventory_window.minsize(400,300)
         self.inventory_window.title("Inventory Menu")
 
-        self.active_item = None
-
-        def set_active(x):
-            self.active_item = x
-
         # adding the buttons
         drop_button = tk.Button(self.inventory_window, text='Drop', command=self.drop)
         drop_button.grid(row=0, column=0, sticky="NESW")
@@ -757,23 +730,17 @@ class Gui:
         use_button = tk.Button(self.inventory_window, text='Use', command=self.use)
         use_button.grid(row=0, column=2, sticky="NESW")
 
-
-        self.inventory_radio = tk.StringVar()
         i=1 # represents the starting row for the first radio button
 
+        # Count item occurrences
+        item_counts = {}
         for item in self.player.inventory:
-            attribute_name = ""
+            item_counts[item.name] = item_counts.get(item.name, 0) + 1
 
-            match item.type:
-                case ItemTypes.MELEE, ItemTypes.RANGED, ItemTypes.SPELLBOOK, ItemTypes.STAFF:
-                    attribute_name = " attack"
-                case ItemTypes.SHIELD, ItemTypes.ARMOUR:
-                    attribute_name = " defense"
-                case default:
-                    pass
-
-            radio_button= tk.Radiobutton(self.inventory_window, text=f"{item.name}: {item.attributeValue}{attribute_name}",
-                                         value=item.__str__(), variable=self.inventory_radio, command=lambda x=item: set_active(x))
+        # Add radiobuttons for each item name
+        for item_name, count in item_counts.items():
+            display_text = item_name if count == 1 else f"{item_name} x{count}"
+            radio_button= tk.Radiobutton(self.inventory_window, text = display_text, value = item_name)
             radio_button.grid(row=i, column=0, columnspan=3, sticky="NESW")
             i+=1
 
@@ -781,70 +748,25 @@ class Gui:
         self.inventory_window.grid_rowconfigure(list(range(i)), weight=1)
         self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
 
-
-            #Old Way
-            #i=1 # represents the starting row for the first radio button
-
-            # Count item occurrences`
-            #item_counts = {}
-            #for item in self.player.inventory:
-            #    item_counts[item.name] = item_counts.get(item.name, 0) + 1
-
-            # Add radiobuttons for each item name
-            #for item_name, count in item_counts.items():
-            #    display_text = item_name if count == 1 else f"{item_name} x{count}"
-            #    radio_button= tk.Radiobutton(self.inventory_window, text = display_text, value = item_name, variable=self.inventory_radio)
-            #    radio_button.grid(row=i, column=0, columnspan=3, sticky="NESW")
-            #    i+=1
-
-            # setting up the window
-            #self.inventory_window.grid_rowconfigure(list(range(i)), weight=1)
-            #self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
-
-    def drop(self):
-        item = self.active_item
-
+    def drop(self, item):
         if item not in self.player.inventory:
-            return
-        self.active_item = None
+            raise ValueError("Item does not exist in the inventory.")
 
         self.player.inventory.remove(item)
         self.floor.room().items.append(item)
-
-        # update the window
-        self.update_room()
-
-        self.inventory_window.destroy()
         self.inventory()
 
-    def equip(self):
-        item = self.active_item
-
-        if item not in self.player.inventory:
-            return
-        self.active_item = None
-
+    def equip(self, item):
         try:
             self.player.equip_from_inventory(item)
         except:
-            messagebox.showinfo('Success', message=f'Cannot equip that item.')
             pass
 
-        # update the window
-        self.inventory_window.destroy()
         self.inventory()
 
-    def use(self):
-        item = self.active_item
-
-        if item is None:
-            return
-
+    def use(self, item):
         if item.type not in [ItemTypes.SHOP, ItemTypes.POTION, ItemTypes.ITEM]:
-            messagebox.showinfo('Success', message=f"Can't use that item.")
             return
-
-        self.active_item = None
 
         message = ""
 
@@ -862,8 +784,6 @@ class Gui:
                 attribute = pow(item.attributeValue + item.item_buff, -1)
                 debuff = Statistic("Weakness", multiplier=attribute, duration=3)
                 self.current_enemy.multipliers["attack"].append(debuff)
-                self.current_enemy.next_attack = None
-                self.current_enemy.get_attack()
                 message = f"Applied weakness"
 
         elif item.name == "Crude Poison Potion":
@@ -874,8 +794,6 @@ class Gui:
                 attribute = pow(item.attributeValue + item.item_buff, -1)
                 debuff = Statistic("Poison", multiplier=attribute, duration=3)
                 self.current_enemy.multipliers["defense"].append(debuff)
-                self.current_enemy.next_defense = None
-                self.current_enemy.get_defense()
                 message = f"Applied poison"
 
         elif item.name == "Pineapple Pizza":
@@ -889,8 +807,6 @@ class Gui:
             buff = Statistic("Defense Buff", multiplier=attribute, duration=5)
             self.player.multipliers["defense"].append(buff)
             self.player.inventory.remove(item)
-            self.player.next_defense = None
-            self.player.get_defense()
             message = "Applied defense buff"
 
         elif item.name == "Attack Potion":
@@ -898,8 +814,6 @@ class Gui:
             buff = Statistic("Attack Buff", multiplier=attribute, duration=5)
             self.player.multipliers["attack"].append(buff)
             self.player.inventory.remove(item)
-            self.player.next_attack = None
-            self.player.get_attack()
             message = "Applied attack buff"
 
         elif item.name == "Weakness Potion":
@@ -910,8 +824,6 @@ class Gui:
                 attribute = pow(item.attributeValue + item.item_buff, -1)
                 debuff = Statistic("Weakness", multiplier=attribute, duration=5)
                 self.current_enemy.multipliers["attack"].append(debuff)
-                self.current_enemy.next_attack = None
-                self.current_enemy.get_attack()
                 message = f"Applied weakness"
 
         elif item.name == "Poison Potion":
@@ -922,17 +834,11 @@ class Gui:
                 attribute = pow(item.attributeValue + item.item_buff, -1)
                 debuff = Statistic("Poison", multiplier=attribute, duration=5)
                 self.current_enemy.multipliers["defense"].append(debuff)
-                self.current_enemy.next_defense = None
-                self.current_enemy.get_defense()
                 message = f"Applied poison"
         else:
             message = "I don't know how to use that item.."
 
         messagebox.showinfo('Use item', message=message)
-
-        # update the window
-        self.inventory_window.destroy()
-        self.inventory()
 
     def stats(self):
         '''
