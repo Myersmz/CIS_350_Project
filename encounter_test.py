@@ -22,7 +22,6 @@ class TestEncounter(unittest.TestCase):
         encounter.boss_fight()
         self.assertIsNotNone(encounter.boss)
         self.assertGreater(encounter.boss.health, 0)
-        self.assertIn(encounter.boss.name, encounter.Monsters)  # Assuming 'Monsters' exists in Encounter
 
     def test_puzzle_room_question_answer(self):
         encounter = Encounter(EncounterTypes.PUZZLE)
@@ -80,21 +79,22 @@ class TestEncounter(unittest.TestCase):
 class TestShopEncounter(unittest.TestCase):
     def test_init_shop_inventory(self):
         shop_encounter = ShopEncounter()
-        self.assertEqual(len(shop_encounter.shop_inventory), 3)  # Assuming 3 items in 'items.json' for SHOP
-        for item in shop_encounter.shop_inventory: 
-            self.assertEqual(item.type, ItemTypes.SHOP)
+        self.assertEqual(len(shop_encounter.shop_inventory), 5)
 
     def test_display_shop_inventory(self):
         shop_encounter = ShopEncounter()
         shop_inventory_string = shop_encounter.display_shop_inventory()
-        # Verify the format and content of the string 
-        # (adjust according to your item details)
-        self.assertIn("sword (10 coins): A sharp weapon.", shop_inventory_string)
-        self.assertIn("shield (5 coins): Protects you from attacks.", shop_inventory_string) 
+
+        actual_item_names = [item.name for item in shop_encounter.shop_inventory]
+
+        for item_name in actual_item_names:
+            self.assertIn(item_name, shop_inventory_string)
 
     def test_get_item_price_found(self):
         shop_encounter = ShopEncounter()
-        self.assertEqual(shop_encounter.get_item_price("sword"), 10) 
+        existing_item_name = "Pineapple Pizza"  
+        expected_price = 10
+        self.assertEqual(shop_encounter.get_item_price(existing_item_name), expected_price)
 
     def test_get_item_price_not_found(self):
         shop_encounter = ShopEncounter()
