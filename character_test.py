@@ -149,7 +149,19 @@ class CharacterTest(unittest.TestCase):
 
     def test_get_character_info(self):
         # Needs to be changed still...
-        pass
+        
+        Stringvalue = f"Character Name: {self.character.name}\n" \
+               f"------~=====+=====~------\n" \
+               f"Character Health: {self.character.health}\n" \
+               f"Character Attack: {self.character.base_attack}\n" \
+               f"Character Defense: {self.character.base_defense}\n" \
+               f"Gold: {self.character.gold}\n" \
+               f"Current Score: {self.character.score}\n" \
+               f"Weapon: {self.character.equipped_weapon.name}\n" \
+               f"Armour: {self.character.equipped_armour.name}\n" \
+               f"Shield: {self.character.equipped_shield.name}"
+        
+        self.assertEqual(self.character.get_character_info(), Stringvalue)
 
     def test_get_attacked(self):
         attacker = Character("Enemy", 10, 10, 0)
