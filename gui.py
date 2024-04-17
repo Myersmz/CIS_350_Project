@@ -223,6 +223,9 @@ class Gui:
         '''
         This function is used for attempting to go west
         '''
+        if self.fight_in_progress:
+            return
+
         # checking for errors
         if self.floor.room().is_dead_end(0):
             messagebox.showerror("Error", message='There is no room west of this room.\n')
@@ -245,6 +248,9 @@ class Gui:
         '''
         This function is used for attempting to go north
         '''
+        if self.fight_in_progress:
+            return
+
         # checking for errors
         if self.floor.room().is_dead_end(1):
             messagebox.showerror("Error", message='There is no room north of this room.\n')
@@ -267,6 +273,9 @@ class Gui:
         '''
         This function is used for attempting to go east
         '''
+        if self.fight_in_progress:
+            return
+
         # checking for errors
         if self.floor.room().is_dead_end(2):
             messagebox.showerror("Error", message='There is no room east of this room.')
@@ -289,6 +298,9 @@ class Gui:
         '''
         This function is used for attempting to go south
         '''
+        if self.fight_in_progress:
+            return
+
         # checking for errors
         if self.floor.room().is_dead_end(3):
             messagebox.showerror("Error", message='There is no room south of this room.\n')
@@ -337,6 +349,9 @@ class Gui:
         '''
         This either opens the guess menu or shows an error based on the type of room the player is in at the time
         '''
+        if self.fight_in_progress:
+            return
+
         if self.floor.room().encounter.encounter_type == EncounterTypes.PUZZLE \
                 and not self.floor.room().encounter.is_empty:
             self.guess_menu()
@@ -491,42 +506,25 @@ class Gui:
         else:
             messagebox.showinfo("The room is empty", message="There is no monster to attack\n")
 
-    def attack(self):
-        print("Old Attack")
-        # if self.floor.room().encounter.encounter_type == EncounterTypes.BOSS \
-        #         and not self.floor.room().encounter.is_empty:
-        #     try:
-        #         self.floor.room().encounter.boss.get_attacked(self.player)
-        #     except CharacterDeathException:
-        #         messagebox.showinfo('Success', message=f'The {self.floor.room().encounter.boss.name} has been slain !!!')
-        #         self.floor.room().encounter.is_empty = True
-        # elif self.floor.room().encounter.encounter_type == EncounterTypes.TRAP \
-        #         and not self.floor.room().encounter.is_empty:
-        #     try:
-        #         self.floor.room().encounter.door.get_attacked(self.player)
-        #     except CharacterDeathException:
-        #         messagebox.showinfo('Success',
-        #                             message=f'The door splinters open and you are free to leave the room !!!')
-        #         self.floor.room().encounter.is_empty = True
-        # else:
-        #     messagebox.showerror("Error", message="There is no monster to attack\n")
-        # self.enterRoom()
-
     def fight_loop(self, monster: Character):
-        fight_window = tk.Toplevel()
-        fight_window.geometry("400x400")
-        fight_window.title("Battle")
+        self.fight_window = tk.Toplevel()
+        self.fight_window.geometry("400x400")
+        self.fight_window.title("Battle")
+
         self.fight_in_progress = True
         self.current_enemy = monster
-        fight_window.grid_rowconfigure([0, 1, 2, 3], weight=1)
-        fight_window.grid_rowconfigure(4, weight=2)  # label weight is higher to be bigger than the buttons
-        # fight_window.grid_rowconfigure(5, weight=1)  # buttons weight
-        fight_window.grid_columnconfigure([0, 1, 2], weight=1)  # only one column
+
+        self.fight_window.grid_rowconfigure([0, 1, 2, 3], weight=1)
+        self.fight_window.grid_rowconfigure(4, weight=2)  # label weight is higher to be bigger than the buttons
+        # self.fight_window.grid_rowconfigure(5, weight=1)  # buttons weight
+        self.fight_window.grid_columnconfigure([0, 1, 2], weight=1)  # only one column
+
         # creating labels
         battle_label = f"Fighting {monster.name}"
-        label_intro = tk.Label(fight_window, text=battle_label)
+        label_intro = tk.Label(self.fight_window, text=battle_label)
         label_intro.grid(row=0, columnspan=3, sticky="NESW")
-        monster_stats = tk.Label(fight_window, text="")
+
+        monster_stats = tk.Label(self.fight_window, text="")
         monster_stats.grid(row=1, columnspan=3, sticky="NESW")
         self.player.next_attack = None
         self.player.next_defense = None
@@ -542,7 +540,7 @@ class Gui:
             try:
                 turn_dialogue += f"{monster.name}: " + monster.get_attacked(self.player) + "\n"
             except CharacterDeathException as E:
-                fight_window.destroy()
+                self.fight_window.destroy()
                 turn_dialogue += f"{monster.name} was slain"
                 messagebox.showinfo('Success',
                                     message=f'You have defeated the {monster.name}!\n{E.args[0]}')
@@ -580,38 +578,55 @@ class Gui:
 
         def update_fight_board():
             monster_stats.configure(text=f"Health: {monster.health} | "
-                                         f"Defense: {monster.get_defense()} |"
-                                         f"Next Attack: {monster.get_attack()}")
+                                        f"Defense: {monster.get_defense()} |"
+                                        f"Next Attack: {monster.get_attack()}")
+
             player_stats.configure(text=f"Health: {self.player.health} | "
                                         f"Defense: {self.player.get_defense()} |"
                                         f"Next Attack: {self.player.get_attack()}")
 
-        dialogue = tk.Label(fight_window, text="")
+        dialogue = tk.Label(self.fight_window, text="")
         dialogue.grid(row=2, columnspan=3, sticky="NESW")
+
         # Player Stats
-        player_stats = tk.Label(fight_window, text="")
+        player_stats = tk.Label(self.fight_window, text="")
         player_stats.grid(row=3, columnspan=3, sticky="NESW")
         update_fight_board()
+
         # creating buttons
-        attack_button = tk.Button(fight_window, text="Attack", command=throw_attack)
+        attack_button = tk.Button(self.fight_window, text="Attack", command=throw_attack)
         attack_button.grid(row=4, column=0, sticky="NESW")
-        item_button = tk.Button(fight_window, text="Items", command=self.inventory)
-        item_button.grid(row=4, column=1, sticky="NESW")
+        item_button = tk.Button(self.fight_window, text="Items", command=self.inventory)
+        item_button.grid(row=4, column=1,  sticky="NESW")
+
+        def flee():
+            if monster.is_boss:
+                messagebox.showinfo('Cannot Flee', message=f'You are trapped with the monster')
+                return
+            self.fight_in_progress = False
+            self.current_enemy = None
+            self.fight_window.destroy()
+
         if self.floor.room().encounter.encounter_type != EncounterTypes.BOSS:
-            flee_button = tk.Button(fight_window, text="Flee", command=fight_window.destroy)
-            flee_button.grid(row=4, column=2, sticky="NESW")
+            flee_button = tk.Button(self.fight_window, text="Flee", command=flee)
+            flee_button.grid(row=4, column=2,  sticky="NESW")
+
         # starting the window
-        fight_window.mainloop()
+        self.fight_window.protocol("WM_DELETE_WINDOW", flee)
+        self.fight_window.mainloop()
 
     def pickup(self):
+        if self.fight_in_progress:
+            return
+
         item_list = self.floor.room().items
+
         # In progress
         if len(item_list) == 0:
             messagebox.showerror("Pickup", message="The room is empty...")
             return
 
         self.item_pickup_menu = tk.Toplevel()
-        self.item_pickup_menu.geometry("200x400")
         self.item_pickup_menu.geometry("200x250")
         self.item_pickup_menu.title("Pickup")
 
@@ -712,21 +727,27 @@ class Gui:
 
     def drop(self):
         item = self.active_item
+
         if item not in self.player.inventory:
             return
         self.active_item = None
+
         self.player.inventory.remove(item)
         self.floor.room().items.append(item)
+
         # update the window
         self.update_room()
+
         self.inventory_window.destroy()
         self.inventory()
 
     def equip(self):
         item = self.active_item
+
         if item not in self.player.inventory:
             return
         self.active_item = None
+
         try:
             self.player.equip_from_inventory(item)
         except:
@@ -739,6 +760,7 @@ class Gui:
 
     def use(self):
         item = self.active_item
+
         if item is None:
             return
 
@@ -747,12 +769,15 @@ class Gui:
             return
 
         self.active_item = None
+
         message = ""
+
         if item.name == "Crude Healing Potion":
             attribute = item.get_attribute()
             self.player.health += attribute
             self.player.inventory.remove(item)
             message = f"Healed {attribute} health"
+
         elif item.name == "Crude Weakness Potion":
             if not self.fight_in_progress:
                 message = "Not in a fight!"
@@ -764,6 +789,7 @@ class Gui:
                 self.current_enemy.next_attack = None
                 self.current_enemy.get_attack()
                 message = f"Applied weakness"
+
         elif item.name == "Crude Poison Potion":
             if not self.fight_in_progress:
                 message = "Not in a fight!"
@@ -775,11 +801,13 @@ class Gui:
                 self.current_enemy.next_defense = None
                 self.current_enemy.get_defense()
                 message = f"Applied poison"
+
         elif item.name == "Pineapple Pizza":
             attribute = item.get_attribute()
             self.player.health += attribute
             self.player.inventory.remove(item)
             message = f"Healed {attribute} health"
+
         elif item.name == "Defense Potion":
             attribute = item.attributeValue * item.item_buff
             buff = Statistic("Defense Buff", multiplier=attribute, duration=5)
@@ -788,6 +816,7 @@ class Gui:
             self.player.next_defense = None
             self.player.get_defense()
             message = "Applied defense buff"
+
         elif item.name == "Attack Potion":
             attribute = item.attributeValue * item.item_buff
             buff = Statistic("Attack Buff", multiplier=attribute, duration=5)
@@ -796,6 +825,7 @@ class Gui:
             self.player.next_attack = None
             self.player.get_attack()
             message = "Applied attack buff"
+
         elif item.name == "Weakness Potion":
             if not self.fight_in_progress:
                 message = "Not in a fight!"
@@ -807,6 +837,7 @@ class Gui:
                 self.current_enemy.next_attack = None
                 self.current_enemy.get_attack()
                 message = f"Applied weakness"
+
         elif item.name == "Poison Potion":
             if not self.fight_in_progress:
                 message = "Not in a fight!"
@@ -820,7 +851,9 @@ class Gui:
                 message = f"Applied poison"
         else:
             message = "I don't know how to use that item.."
+
         messagebox.showinfo('Use item', message=message)
+
         # update the window
         self.inventory_window.destroy()
         self.inventory()
@@ -829,12 +862,14 @@ class Gui:
         '''
         This creates a top level menu for showing the stats of the player
         '''
+
         # creating the screen - Toplevel pops up without the mainloop() call
         self.stats_window = tk.Toplevel()
         self.stats_window.minsize(250, 250)
         self.stats_window.title("Stats Menu")
         self.stats_window.grid_rowconfigure(0, weight=1)
         self.stats_window.grid_columnconfigure(0, weight=1)
+
         # creating labels
         label_stats = tk.Label(self.stats_window, text=self.player.get_character_info())
         label_stats.grid(row=0, column=0, sticky="NESW")
@@ -843,12 +878,16 @@ class Gui:
         '''
         This creates a top level menu for showing the game menu
         '''
+        if self.fight_in_progress:
+            return
+
         # creating the screen - Toplevel pops up without the mainloop() call
         self.menu_window = tk.Toplevel()
         self.menu_window.minsize(250, 250)
         self.menu_window.title("Menu")
         self.menu_window.grid_rowconfigure([0, 1, 2, 3], weight=1)
         self.menu_window.grid_columnconfigure(0, weight=1)
+
         # creating the buttons
         button_save = tk.Button(self.menu_window, text='Save', command=self.save)
         button_save.grid(row=0, sticky="NESW")
