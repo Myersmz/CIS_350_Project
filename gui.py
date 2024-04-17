@@ -15,7 +15,6 @@ class Gui:
         self.player = None
         self.floor = None
         self.game_started = False
-        self.dungeonSize = 14
         self.room_text = ""
         self.active_item = None
         # Battle Vars
