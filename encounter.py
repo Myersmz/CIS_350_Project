@@ -99,7 +99,7 @@ class Encounter:
 
 class ShopEncounter:
     def __init__(self):
-        self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION'], item_type=ItemTypes.SHOP, attribute_value=item['ATTRIBUTE']) for item in items.get("SHOP")]
+        self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION'], item_type=ItemTypes.SHOP, attribute_value=10) for item in items.get("SHOP")]
 
     # Return string representation of shop items
     def display_shop_inventory(self):

@@ -413,7 +413,8 @@ class Gui:
             for _ in range(quantity):
                 for item in self.floor.room().encounter.shop_encounter.shop_inventory:
                     if item.name == selected_item_name:
-                        self.player.add_to_inventory(item)
+                        new_item = Item(name=item.name, description=item.description, attribute_value=item.attributeValue)  # Generate new instance
+                        self.player.add_to_inventory(new_item)  # Add the new instance
                         break  # Exit the inner loop once the item is found
             # Inform the player about the purchase
             messagebox.showinfo("Success", f"You purchased {quantity} {selected_item_name}(s).")
