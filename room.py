@@ -5,8 +5,9 @@ import character
 
 class Room:
     """
-    This is the class for representing and storing information about the room. The rooms work similar to a linked list with adjacent rooms holding what rooms
-    there are for being adjacent. Uses the encounter class to make the type of room. Uses the item class for any items dropped in the room.
+    This is the class for representing and storing information about the room. The rooms work similar to a linked list
+    with adjacent rooms holding what rooms there are for being adjacent. Uses the encounter class to make the type of
+    room. Uses the item class for any items dropped in the room.
     """
 
     def __init__(self, name, left=None, up=None, right=None, down=None, item_list=None, position=None,
@@ -30,11 +31,19 @@ class Room:
         self.visited = False
 
     def initiate(self):
+        """
+        Initiates the room, creates the encounter, generates monsters and items.
+        :return:
+        """
         self.encounter = Encounter(self.encounter_type)
         self.generate_monsters()
         self.generate_items()
 
     def generate_monsters(self):
+        """
+        Generates monsters in the room
+        :return:
+        """
         if self.encounter_type in (EncounterTypes.BOSS, EncounterTypes.TRAP, EncounterTypes.SHOP):
             return
 
@@ -42,9 +51,15 @@ class Room:
             self.monsters.append(character.get_monster())
 
     def generate_items(self):
+        """
+        Generates items within the room
+        :return:
+        """
+        # Does not generate in boss or shop rooms.
         if self.encounter_type in (EncounterTypes.BOSS, EncounterTypes.SHOP):
             return
 
+        # Room can have 1 to 3 items, or none.
         count = random.randint(-1, 2)
 
         for i in range(count):
@@ -97,28 +112,6 @@ class Room:
             return False
         else:
             return True
-
-    # def grab_item(self, item_name : str):
-    #    """
-    #    This function is for checking for and taking an item out of a room. currently not implemented.
-    #    """
-    #
-    #   if not isinstance(item_name, str):
-    #        raise TypeError("Item_name should be a string")
-    #
-    #   for i in self.items:
-    #      if i.name == item_name:
-    #           self.items.remove(i)
-    #          return i
-
-    # def add_item(self, item: Item):
-    #     """
-    #     This function is for adding an item to a room will be used in future release.
-    #     """
-    #     if isinstance(item, Item):
-    #         self.items.append(item)
-    #     else:
-    #         raise(TypeError, "Not a valid item")
 
     def remove_item(self, item: Item):
         """

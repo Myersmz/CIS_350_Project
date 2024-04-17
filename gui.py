@@ -389,6 +389,10 @@ class Gui:
         self.enterRoom()
 
     def shop_window(self):
+        """
+        Creates a window for the shop where items can be bought for gold.
+        :return:
+        """
         # Create a new window for the shop
         self.shop_window_var = tk.Toplevel(self.screen_game)
         self.shop_window_var.title("Shop")
@@ -441,6 +445,10 @@ class Gui:
         exit_button.pack()
 
     def end_game(self):
+        """
+        Ends the game in the context that the player died.
+        :return:
+        """
         self.game_started = False
         end_score = str(self.player.get_score())
         messagebox.showerror("Game over", message='\nYour journey has ended.\n Your final score was: ' + end_score)
@@ -448,10 +456,17 @@ class Gui:
         self.start_menu_screen()
 
     def update_room(self, label_text=None):
+        """
+        Updates the room's text in the game menu.
+        Shows Monsters and Items in the room
+        :param label_text:
+        :return:
+        """
         if label_text is not None:
             self.room_text = label_text
         else:
             label_text = self.room_text
+
         if len((mons := self.floor.room().monsters)) != 0:
             label_text += f'\nMonsters: ' + ', '.join([x.name for x in mons])
         if len((_items := self.floor.room().items)) != 0:
@@ -488,6 +503,10 @@ class Gui:
         self.label2.configure(text=f'\nThere are rooms to the {self.floor.room().directions()} of this room\n')
 
     def stage_attack(self):
+        """
+        Start a fight. Intended to be the button function.
+        :return:
+        """
         if self.fight_in_progress:
             return
 
@@ -506,6 +525,11 @@ class Gui:
             messagebox.showinfo("The room is empty", message="There is no monster to attack\n")
 
     def fight_loop(self, monster: Character):
+        """
+        Opens the fight window and blocks other actions from running.
+        :param monster: Character to fight.
+        :return:
+        """
         self.fight_window = tk.Toplevel()
         self.fight_window.geometry("400x400")
         self.fight_window.title("Battle")
@@ -535,6 +559,10 @@ class Gui:
         self.current_enemy.get_attack()
 
         def throw_attack():
+            """
+            Attack the monster and then get attacked by the monster.
+            :return:
+            """
             turn_dialogue = ""
             try:
                 turn_dialogue += f"{monster.name}: " + monster.get_attacked(self.player) + "\n"
@@ -576,6 +604,10 @@ class Gui:
             update_fight_board()
 
         def update_fight_board():
+            """
+            Updates the text in the fight window.
+            :return:
+            """
             monster_stats.configure(text=f"Health: {monster.health} | "
                                         f"Defense: {monster.get_defense()} |"
                                         f"Next Attack: {monster.get_attack()}")
@@ -599,6 +631,11 @@ class Gui:
         item_button.grid(row=4, column=1,  sticky="NESW")
 
         def flee():
+            """
+            Closes the fight window.
+            Does not close the window if it is a boss.
+            :return:
+            """
             if monster.is_boss:
                 messagebox.showinfo('Cannot Flee', message=f'You are trapped with the monster')
                 return
@@ -615,6 +652,10 @@ class Gui:
         self.fight_window.mainloop()
 
     def pickup(self):
+        """
+        Opens a menu to pick up any items in the room.
+        :return:
+        """
         if self.fight_in_progress:
             return
 
@@ -657,6 +698,12 @@ class Gui:
         close_button.pack()
 
     def pickup_item(self, button: tk.Button, item: Item):
+        """
+        Picks up the item pressed from the room and places it in the player inventory.
+        :param button: Pickup button
+        :param item: Item to grab.
+        :return:
+        """
         button.destroy()
         self.player.add_to_inventory(item)
         for i in range(len(self.floor.room().items)):
@@ -708,23 +755,12 @@ class Gui:
         # setting up the window
         self.inventory_window.grid_rowconfigure(list(range(i)), weight=1)
         self.inventory_window.grid_columnconfigure([0, 1, 2], weight=1)
-        # Old Way
-        # i=1 # represents the starting row for the first radio button
-        # Count item occurrences`
-        # item_counts = {}
-        # for item in self.player.inventory:
-        #    item_counts[item.name] = item_counts.get(item.name, 0) + 1
-        # Add radiobuttons for each item name
-        # for item_name, count in item_counts.items():
-        #    display_text = item_name if count == 1 else f"{item_name} x{count}"
-        #    radio_button= tk.Radiobutton(self.inventory_window, text = display_text, value = item_name, variable=self.inventory_radio)
-        #    radio_button.grid(row=i, column=0, columnspan=3, sticky="NESW")
-        #    i+=1
-        # setting up the window
-        # self.inventory_window.grid_rowconfigure(list(range(i)), weight=1)
-        # self.inventory_window.grid_columnconfigure([0,1,2], weight=1)
 
     def drop(self):
+        """
+        Drops an item selected in the inventory into the room.
+        :return:
+        """
         item = self.active_item
 
         if item not in self.player.inventory:
@@ -741,6 +777,10 @@ class Gui:
         self.inventory()
 
     def equip(self):
+        """
+        Equips an item selected in the inventory to a player.
+        :return:
+        """
         item = self.active_item
 
         if item not in self.player.inventory:
@@ -758,6 +798,10 @@ class Gui:
         self.inventory()
 
     def use(self):
+        """
+        Uses an item selected in the inventory menu. Applies it to the player or monster when applicable.
+        :return:
+        """
         item = self.active_item
 
         if item is None:
@@ -898,6 +942,10 @@ class Gui:
         button_return.grid(row=3, sticky="NESW")
 
     def descend(self):
+        """
+        Generates a new floor and enters it.
+        :return:
+        """
         self.floor.generate_new_floor()
         self.enterRoom()
 

@@ -3,6 +3,10 @@ from statistic import Statistic, multipliers
 
 
 class Floor:
+    """
+    Represents a whole game floor, and can be regenerated without creating a new object.
+    Also handles increasing the difficulty when clearing floors.
+    """
     def __init__(self):
         self.dungeon_size = 8
         self.cleared_floors = 0
@@ -10,16 +14,24 @@ class Floor:
         self.current_room = self.generate_floor()
 
     def generate_new_floor(self):
+        """
+        Generates a new floor and increases the difficulty.
+        :return:
+        """
         self.cleared_floors += 1
         self.increase_difficulty()
         self.current_room = self.generate_floor()
 
     def room(self) -> Room:
+        """
+        Accessor for self.current_room
+        :return:
+        """
         return self.current_room
 
     def increase_difficulty(self):
         """
-        Increases the games difficultly by applying universal stat buffs and increases the floor size.
+        Increases the games difficultly by applying global stat buffs for monsters and increases the floor size.
         Also increases the effectiveness of items.
         """
 
@@ -101,7 +113,7 @@ class Floor:
 
         other_rooms = [rooms.pop(0)]  # removes the entrance for the list because we want it to be empty.
 
-        # Add boss room to a room with the least connections
+        # Add boss room to a room with the least connections to prevent map splitting.
         rooms.sort(key=lambda room: len([x for x in room.adjacentRooms if x is not None]))
         min_connections = len([x for x in rooms[0].adjacentRooms if x is not None])
         leaf_rooms = [x for x in rooms if len([x for x in rooms[0].adjacentRooms if x is not None]) == min_connections]

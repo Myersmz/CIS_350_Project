@@ -55,20 +55,29 @@ class Encounter:
         self.door = None
         self.generate_encounter(encounter_type)
 
-    # chooses random monster from Monsters list
     def boss_fight(self):
+        """
+        Creates boss character.
+        :return:
+        """
         self.is_empty = False
 
         # create boss object
         self.boss = character.get_boss()
 
-    # chooses random question
     def puzzle_room(self):
+        """
+        Sets up the puzzle question.
+        :return:
+        """
         self.is_empty = False
         self.puzzle_question = random.choice(self.questions)
 
-    # chooses random math problem
     def trap_room(self):
+        """
+        Chooses a math question and creates the door character.
+        :return:
+        """
         self.is_empty = False
         self.trap_problem = random.choice(self.issues)
 
@@ -76,9 +85,18 @@ class Encounter:
         self.door = Character('Door', 15, 0, 0)
 
     def empty_room(self):
+        """
+        Set the room as empty.
+        :return:
+        """
         self.is_empty = True
 
     def generate_encounter(self, encounter_type=None):
+        """
+        Runs the appropriate function for the type of encounter.
+        :param encounter_type: Encounter type to create.
+        :return:
+        """
         if encounter_type is None:
             self.encounter_type = EncounterTypes(random.randint(1, max_generation_rooms))
         else:
@@ -98,6 +116,9 @@ class Encounter:
 
 
 class ShopEncounter:
+    """
+    Specialized encounter for shop rooms.
+    """
     def __init__(self):
         self.shop_inventory = [Item(name=item['NAME'], description=item['DESCRIPTION'], item_type=ItemTypes.SHOP, attribute_value=10) for item in items.get("SHOP")]
 

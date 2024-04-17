@@ -53,12 +53,16 @@ class Character:
 
     def assign_boss(self):
         """
-        Sets a flag to allow slightly different functionality of player vs monster.
+        Sets a flag to allow slightly different functionality of boss.
         :return:
         """
         self.is_boss = True
 
     def start_next_turn(self):
+        """
+        Resets the attack and defense values and decrements the duration of any Statistics.
+        :return:
+        """
         self.next_attack = None
         self.next_defense = None
 
@@ -71,8 +75,12 @@ class Character:
                 else:
                     mult.duration -= 1
 
-    # Adds an item to inventory
     def add_to_inventory(self, item):
+        """
+        Adds item to the inventory, if it is gold it instead adds the value to an int var.
+        :param item: Item to add [Items named "Gold" will not be added to the inventory]
+        :return:
+        """
         if item.name == "Gold":
             self.add_gold(item.get_attribute())
             return
@@ -80,10 +88,20 @@ class Character:
 
     # Takes an item from inventory
     def remove_from_inventory(self, item):
+        """
+        Removes an item from the inventory.
+        :param item: Item to remove.
+        :return:
+        """
         if item in self.inventory:
             self.inventory.remove(item)
 
     def equip_from_inventory(self, item: Item):
+        """
+        Equips and item from the inventory. The item must be in the inventory.
+        :param item: An item from the inventory.
+        :return:
+        """
         if item not in self.inventory:
             raise ValueError("Item is not in my inventory")
 
@@ -106,17 +124,7 @@ class Character:
         if old_item.name not in ["None", "Hands"]:
             self.inventory.append(old_item)
 
-    # # Prints character information
-    # def print_character_info(self):
-    #     print("Character Name:", self.name)
-    #     print("Character Health:", self.health)
-    #     print("Character Attack:", self.base_attack)
-    #     print("Character Defense:", self.base_defense)
-    #     print("Character Inventory:", self.inventory)
-    #     print("Current Score: ", self.score)
-
     def get_character_info(self):
-
         return f"Character Name: {self.name}\n" \
                f"------~=====+=====~------\n" \
                f"Character Health: {self.health}\n" \
@@ -128,8 +136,12 @@ class Character:
                f"Armour: {self.equipped_armour.name}\n" \
                f"Shield: {self.equipped_shield.name}"
 
-            # Causes damage from one character to another, based on their attack and defense stats.
     def get_attacked(self, attacker):
+        """
+        Takes damage from the attacker.
+        :param attacker: Character
+        :return:
+        """
         damage = attacker.get_attack()
         defense = self.get_defense()
         attack = max(0, (damage - defense))
@@ -143,6 +155,11 @@ class Character:
             return f"Took {attack} damage"
 
     def transfer_inventory(self, target):
+        """
+        For monsters; transfers any inventory items to the target.
+        :param target: Character
+        :return:
+        """
         item_str = "Obtained\n"
 
         if len(self.inventory) == 0:
@@ -211,6 +228,7 @@ class Character:
     def get_score(self) -> int:
         return self.score
 
+
 class CharacterDeathException(BaseException):
     """
     Description: Exception for when a character dies handled in game.py raised in character.py
@@ -222,6 +240,10 @@ class CharacterDeathException(BaseException):
 
 
 def get_monster() -> Character:
+    """
+    Generates a monster from the monsters json file. Randomizes the attributes.
+    :return: Character
+    """
     monster_list = monsters.get("monster")
 
     monster = monster_list[random.randint(0, len(monster_list) - 1)]
@@ -253,6 +275,10 @@ def get_monster() -> Character:
 
 
 def get_boss():
+    """
+    Generates a boss from the monsters json file. Randomizes the attributes.
+    :return: Character
+    """
     boss_list = monsters.get("boss")
 
     boss = boss_list[random.randint(0, len(boss_list) - 1)]
